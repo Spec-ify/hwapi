@@ -1,6 +1,6 @@
 use crate::cpu::Cpu;
-use serde::{Deserialize, Serialize};
-use serde_json::{Number, Value};
+use serde::Deserialize;
+use serde_json::Value;
 use std::collections::HashMap;
 
 // input.json was obtained by going to https://www.amd.com/en/products/specifications/processors, and hitting the export icon -> json
