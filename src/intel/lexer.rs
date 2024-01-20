@@ -1,6 +1,5 @@
 use core::slice;
 use std::error::Error;
-use std::iter;
 
 use nom::bytes::complete::{tag, take_till, take_until, take_while};
 use nom::sequence::{delimited, preceded, terminated};

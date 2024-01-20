@@ -1,23 +1,24 @@
-use std::{collections::HashMap, fs};
+use self::parser::parse_csv;
+use super::cpu::Cpu;
 
 mod lexer;
 mod parser;
 
-const FILE_PATH: &str = "input.csv";
+// This csv was obtained by going to https://ark.intel.com/content/www/us/en/ark/search/featurefilter.html?productType=873,
+// selecting a filter that includes every single processor (eg, 1 core to [max] cores) -> Compare all -> Compare -> Export Comparison
+// note: you need to actually manually load everything in for the csv to contain everything
+const FILE_CONTENTS: &str = include_str!("input.csv");
 
-fn read_file(path: &str) -> String {
-    fs::read_to_string(path).expect("failed to read file")
+pub fn get_intel_cpus() -> Vec<Cpu> {
+    parse_csv(FILE_CONTENTS).unwrap()
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{parser::parse_csv, read_file, FILE_PATH};
+    use super::{parser::parse_csv, FILE_CONTENTS};
 
     #[test]
     fn it_works() {
-        let file_contents = read_file(FILE_PATH);
-        println!("{:#?}", parse_csv(&file_contents).unwrap());
-        //
-        // let _ = parse_csv(&file_contents).unwrap();
+        parse_csv(FILE_CONTENTS).unwrap();
     }
 }
