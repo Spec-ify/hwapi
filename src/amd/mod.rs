@@ -37,7 +37,7 @@ fn process_json(json: AmdJson) -> Vec<Cpu> {
             }
         };
         let mut output_cpu = Cpu {
-            name: name,
+            name,
             attributes: HashMap::with_capacity(75),
         };
         for key in raw_data.keys() {
@@ -46,7 +46,7 @@ fn process_json(json: AmdJson) -> Vec<Cpu> {
             if blacklist.contains(&key.as_str()) {
                 continue;
             }
-            if raw_data[key] == String::from("") {
+            if raw_data[key] == *"" {
                 continue;
             }
             // sometimes attributes are a number instead of a string, deal with that now

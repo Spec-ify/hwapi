@@ -1,9 +1,9 @@
 use core::slice;
 use std::error::Error;
 
-use nom::bytes::complete::{tag, take_till, take_until, take_while};
-use nom::sequence::{delimited, preceded, terminated};
-use nom::{IResult, InputLength};
+use nom::bytes::complete::{tag, take_until};
+use nom::sequence::{delimited, terminated};
+use nom::IResult;
 
 /// Everything deserialized by the lexer
 #[derive(Debug)]
@@ -25,7 +25,7 @@ pub fn lex_csv<'a>(input: &'a str) -> Result<LexerOutput, Box<dyn Error + 'a>> {
     let mut serialized_records: Vec<&str> = Vec::with_capacity(256);
     let mut iterated_output =
         read_section(cpu_combinator_output.0).expect("Failed to read first section");
-    while iterated_output.0.len() > 0 {
+    while !iterated_output.0.is_empty() {
         // println!("iterated output: {:?}", iterated_output);
         serialized_records.push(iterated_output.1);
         iterated_output = read_section(iterated_output.0)?;
@@ -64,10 +64,10 @@ fn read_cpu_record(input: &str) -> IResult<&str, Vec<&str>> {
 
 fn read_record(input: &str) -> IResult<&str, Vec<&str>> {
     let record: (&str, &str) = take_until("\n")(input)?;
-    let split_input: Vec<&str> = record.1.split(",").collect();
+    let split_input: Vec<&str> = record.1.split(',').collect();
     // .strip_prefix is used because take_until includes the "until" part
     // in the remainder instead of dropping it
-    Ok((record.0.strip_prefix("\n").unwrap(), split_input))
+    Ok((record.0.strip_prefix('\n').unwrap(), split_input))
 }
 
 /// The majority of the actual data organized into sections, this function reads a "block", or

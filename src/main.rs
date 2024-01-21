@@ -1,9 +1,6 @@
-
 use amd::get_amd_cpus;
 use intel::get_intel_cpus;
 use levenshtein::levenshtein;
-
-use serde_json::to_string;
 
 mod amd;
 mod cpu;
@@ -28,7 +25,7 @@ fn main() {
     for cpu in cpus {
         let model: String = find_model(&cpu.name).to_string();
         // levenshtein's similarity algorithm is used to find th the most likely product
-        scoring.push((levenshtein(&input_model, &model), cpu.name));
+        scoring.push((levenshtein(input_model, &model), cpu.name));
     }
     scoring.sort_by_key(|k| k.0);
     // trim the last few entries so it fits on my screen
@@ -47,7 +44,7 @@ fn main() {
 fn find_model(input: &str) -> &str {
     let mut best_fit = "";
     let mut high_score: isize = -10;
-    for token in input.split(" ") {
+    for token in input.split(' ') {
         let score = calculate_model_score(token);
         if score > high_score {
             best_fit = token;
@@ -59,7 +56,7 @@ fn find_model(input: &str) -> &str {
 
 /// This function tries to determine the likelihood that the given token is the "model" of a cpu.
 /// For example, with the string "Intel(R) Core(TM) i5-9400F CPU @ 2.90GHz", the token "i5-9400F"
-/// would be given the highest score, while tokens like "Intel(R)" would ideally be given a significantly lower score 
+/// would be given the highest score, while tokens like "Intel(R)" would ideally be given a significantly lower score
 fn calculate_model_score(token: &str) -> isize {
     // The theory is that any token that contains numbers is more likely to be a model number,
     // and any token that contains characters that aren't likely to exist in a model are less
@@ -67,7 +64,7 @@ fn calculate_model_score(token: &str) -> isize {
     let mut score: isize = 0;
     let blacklist = ['.', '(', ')'];
     for c in token.chars() {
-        if c.is_digit(10) {
+        if c.is_ascii_digit() {
             score += 2;
         }
         if blacklist.contains(&c) {

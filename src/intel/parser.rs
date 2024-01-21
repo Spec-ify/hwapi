@@ -15,7 +15,7 @@ pub fn parse_csv(csv: &'_ str) -> Result<Vec<Cpu>, Box<dyn Error + '_>> {
         for record in lexer_output.records.clone() {
             // the first item in each record is the label, the items are in columns with the cpus
             let entry = record[i + 1];
-            if entry != "" {
+            if entry.is_empty() {
                 cpu.attributes
                     .insert(record[0].to_string(), entry.to_string());
             }
