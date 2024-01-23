@@ -2,11 +2,11 @@ use std::collections::HashMap;
 
 use levenshtein::levenshtein;
 use serde::Serialize;
-mod intel;
 mod amd;
+mod intel;
 
-use intel::get_intel_cpus;
 use amd::get_amd_cpus;
+use intel::get_intel_cpus;
 
 /// A generic representation of a cpu
 #[derive(Clone, Debug, Serialize)]
@@ -17,6 +17,7 @@ pub struct Cpu {
     pub attributes: HashMap<String, String>,
 }
 
+#[derive(Clone)]
 pub struct CpuCache {
     intel_cpus: Vec<Cpu>,
     amd_cpus: Vec<Cpu>,
@@ -24,7 +25,7 @@ pub struct CpuCache {
 
 impl CpuCache {
     /// Create a new cache and parse the cpu databases into memory
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             intel_cpus: get_intel_cpus(),
             amd_cpus: get_amd_cpus(),
@@ -46,7 +47,7 @@ impl CpuCache {
 
         let mut best_fit = Cpu {
             name: "FUBAR".to_string(),
-            attributes: HashMap::new()
+            attributes: HashMap::new(),
         };
         let mut best_score: usize = 10000;
         for cpu in cpus {
@@ -61,7 +62,7 @@ impl CpuCache {
         }
 
         best_fit
-        }
+    }
 }
 
 /// Search the input string for the section that refers to the model of a CPU.
@@ -111,20 +112,31 @@ mod tests {
         // these test cases should be filled out as time goes on with failing test cases
         // any test cases commented out currently fail
         let pairings = [
-            ("AMD Ryzen™ 5 3400G with Radeon™ RX Vega 11 Graphics", "AMD Ryzen 5 3400G with Radeon Vega Graphics"),
-            ("AMD Ryzen™ 5 PRO 4650G", "AMD Ryzen 5 PRO 4650G with Radeon Graphics"),
-            ("Intel® Core™ i3-9100F Processor", "Intel(R) Core(TM) i3-9100F CPU @ 3.60GHz"),
+            (
+                "AMD Ryzen™ 5 3400G with Radeon™ RX Vega 11 Graphics",
+                "AMD Ryzen 5 3400G with Radeon Vega Graphics",
+            ),
+            (
+                "AMD Ryzen™ 5 PRO 4650G",
+                "AMD Ryzen 5 PRO 4650G with Radeon Graphics",
+            ),
+            (
+                "Intel® Core™ i3-9100F Processor",
+                "Intel(R) Core(TM) i3-9100F CPU @ 3.60GHz",
+            ),
             ("AMD Ryzen™ 5 5600", "AMD Ryzen 5 5600 6-Core Processor"),
             ("AMD Ryzen™ 5 2600", "AMD Ryzen 5 2600 Six-Core Processor"),
             ("AMD Ryzen™ 5 7600", "AMD Ryzen 5 7600 6-Core Processor"),
             // ("AMD Ryzen™ 5 7530U", "AMD Ryzen 5 7530U with Radeon Graphics"),
-            ("Intel® Core™ i9-9900K Processor", "Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz")
+            (
+                "Intel® Core™ i9-9900K Processor",
+                "Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz",
+            ),
         ];
 
         for pairing in pairings {
             let found_cpu = cache.find(pairing.1);
             assert_eq!(found_cpu.name, pairing.0);
         }
-
     }
 }

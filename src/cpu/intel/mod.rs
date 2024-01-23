@@ -19,7 +19,7 @@ mod tests {
     use super::{parser::parse_csv, FILE_CONTENTS};
 
     #[test]
-    fn it_works() {
+    fn it_work() {
         parse_csv(FILE_CONTENTS).unwrap();
     }
 }
