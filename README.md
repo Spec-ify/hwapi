@@ -37,3 +37,8 @@ The json submitted should look like this:
 ```
 
 This endpoint does not guarantee the correctness of the model returned, it will always attempt to return a model.
+
+Here's an example curl request:
+```
+curl -X GET -H "Content-Type: application/json" -d '{"name": "Intel Core i9-9900k"}'
+```
