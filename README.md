@@ -16,7 +16,7 @@ To build a release executable:
 ```
 cargo build --release
 ```
-The resulting executable will be loacted in `./target/release/`.
+The resulting executable will be located in `./target/release/`.
 
 ## Testing
 Testing also requires the rust toolchain installed.
@@ -25,6 +25,9 @@ To test the project:
 ```
 cargo test
 ```
+
+## Configuration
+By default, the application listens on port `3000`, although that can be configured by setting the `HWAPI_PORT` environment variable or by passing `-p`/`--port`.
 
 ## Endpoints
 To interact with the cpu api, submit a `GET` request to `/api/cpus` with a `Content-Type` of `application/json`.
