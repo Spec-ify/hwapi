@@ -36,8 +36,7 @@ impl CpuCache {
     /// and return it. For example, it might take an input of "AMD Ryzen 5 3600 6-Core Processor",
     /// and return the entry with a `name` of "AMD Ryzen™ 5 3600"
     pub fn find(&self, input: &str) -> Cpu {
-        // let input_str = String::from("AMD Ryzen 5 3600 6-Core Processor");
-        let input_model = find_model(&input);
+        let input_model = find_model(input);
         // a list of CPUs, and the most likely
         let cpus = if input.contains("AMD") {
             &self.amd_cpus

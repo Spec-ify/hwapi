@@ -13,11 +13,19 @@ struct CpuQuery {
     pub name: String,
 }
 
+/// This handler accepts a json in the form of a [CpuQuery]
+/// ```json
+/// {
+///     "name": "SEARCH_QUERY"
+/// }
+/// ```
+/// It relies on a globally shared [AppState] to re-use the cpu cache, and responds to the request with a serialized [Cpu].
+/// It will always attempt to find a cpu, and should always return a cpu. The correctness of the return value is not guaranteed.
 async fn get_cpu_handler(State(state): State<AppState>, Json(query): Json<CpuQuery>) -> Json<Cpu> {
     // just to get type annotations working
     let state: AppState = state;
+
     Json(state.cpu_cache.find(&query.name))
-    
 }
 
 #[tokio::main]
