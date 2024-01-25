@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use levenshtein::levenshtein;
-use serde::Serialize;
 use log::debug;
+use serde::Serialize;
 mod amd;
 mod intel;
 
@@ -65,7 +65,10 @@ impl CpuCache {
                 best_fit = cpu.clone();
             }
         }
-        debug!("Given the input: {:?}, the CPU {:?} was found", input, best_fit.name);
+        debug!(
+            "Given the input: {:?}, the CPU {:?} was found",
+            input, best_fit.name
+        );
         best_fit
     }
 }

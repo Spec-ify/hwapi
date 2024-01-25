@@ -16,7 +16,7 @@ impl log::Log for SimpleLogger {
     fn enabled(&self, metadata: &Metadata) -> bool {
         // determine at what level things will be logged at
         // TODO: make this configurable via environment variable
-        metadata.level() <= Level::Info
+        metadata.level() <= Level::Error
     }
 
     fn log(&self, record: &Record) {
