@@ -22,9 +22,11 @@ pub struct Cpu {
 pub struct CpuCache {
     intel_cpus: Vec<Cpu>,
     amd_cpus: Vec<Cpu>,
+    comparison_cache: HashMap<String, String>,
 }
 
 impl CpuCache {
+
     /// Create a new cache and parse the cpu databases into memory
     pub fn new() -> Self {
         let intel_cpus = get_intel_cpus();
@@ -35,13 +37,16 @@ impl CpuCache {
         Self {
             intel_cpus,
             amd_cpus,
+            comparison_cache: HashMap::new(),
         }
     }
 
     /// Given a string that contains the inexact name of a cpu, try to find the best fit
     /// and return it. For example, it might take an input of "AMD Ryzen 5 3600 6-Core Processor",
-    /// and return the entry with a `name` of "AMD Ryzen™ 5 3600"
-    pub fn find(&self, input: &str) -> Cpu {
+    /// and return the entry with a `name` of "AMD Ryzen™ 5 3600".
+    /// 
+    /// A mutable reference is required so that the comparison cache can be shared between calls
+    pub fn find(&mut self, input: &str) -> Cpu {
         let input_model = find_model(input);
         // a list of CPUs, and the most likely
         let cpus = if input.contains("AMD") {
@@ -49,7 +54,11 @@ impl CpuCache {
         } else {
             &self.intel_cpus
         };
-
+        // first see if a comparison has already been made
+        if let Some(cpu_name) = self.comparison_cache.get(input) {
+            return cpus.into_iter().filter(|cpu| cpu.name == cpu_name.to_string()).nth(0).unwrap().clone()
+        }
+        // performing a full search if the cpu isn't found in the cache
         let mut best_fit = Cpu {
             name: "FUBAR".to_string(),
             attributes: HashMap::new(),
@@ -65,6 +74,7 @@ impl CpuCache {
                 best_fit = cpu.clone();
             }
         }
+        self.comparison_cache.insert(input.to_string(), best_fit.name.clone());
         debug!(
             "Given the input: {:?}, the CPU {:?} was found",
             input, best_fit.name
@@ -115,7 +125,7 @@ mod tests {
 
     #[test]
     fn search_resilience() {
-        let cache = CpuCache::new();
+        let mut cache = CpuCache::new();
         // on the left is the name stored in the cache, on the right is the name collected from WMI data
         // these test cases should be filled out as time goes on with failing test cases
         // any test cases commented out currently fail
