@@ -1,6 +1,7 @@
 mod cpu;
 
 use axum::extract::Query;
+use axum::http::HeaderValue;
 use axum::{extract::State, routing::get, Json, Router};
 use chrono::Local;
 use clap::Parser;
@@ -84,7 +85,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // create a new http router and register respective routes and handlers
     let app = Router::new()
         .route("/api/cpus/", get(get_cpu_handler))
-        .layer(CorsLayer::very_permissive())
+        .layer(CorsLayer::new().allow_origin("*".parse::<HeaderValue>().unwrap()))
         .with_state(AppState {
             cpu_cache: CpuCache::new(),
         });
