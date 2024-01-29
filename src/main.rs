@@ -10,6 +10,7 @@ use log::info;
 use log::{Level, LevelFilter, Metadata, Record};
 use serde::{Deserialize, Serialize};
 use std::env;
+use tower_http::cors::CorsLayer;
 /// https://docs.rs/log/latest/log/#implementing-a-logger
 struct SimpleLogger;
 
@@ -83,6 +84,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // create a new http router and register respective routes and handlers
     let app = Router::new()
         .route("/api/cpus/", get(get_cpu_handler))
+        .layer(CorsLayer::very_permissive())
         .with_state(AppState {
             cpu_cache: CpuCache::new(),
         });
