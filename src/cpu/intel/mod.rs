@@ -38,7 +38,7 @@ let ids = [PASTE_IDS_HERE];
 }, []);
 
 for (const chunk of chunks) {
-	console.log("https://ark.intel.com/content/www/us/en/ark/compare.html?productIds=" + chunk.join(","));
+    console.log("https://ark.intel.com/content/www/us/en/ark/compare.html?productIds=" + chunk.join(","));
 }
 ```
 */

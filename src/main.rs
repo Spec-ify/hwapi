@@ -1,13 +1,14 @@
 mod cpu;
 
+use axum::extract::Query;
 use axum::{extract::State, routing::get, Json, Router};
-use cpu::{Cpu, CpuCache};
-use log::info;
-use log::{Record, Metadata, Level, LevelFilter};
-use serde::{Deserialize, Serialize};
-use colored::*;
 use chrono::Local;
 use clap::Parser;
+use colored::*;
+use cpu::{Cpu, CpuCache};
+use log::info;
+use log::{Level, LevelFilter, Metadata, Record};
+use serde::{Deserialize, Serialize};
 use std::env;
 /// https://docs.rs/log/latest/log/#implementing-a-logger
 struct SimpleLogger;
@@ -16,7 +17,7 @@ impl log::Log for SimpleLogger {
     fn enabled(&self, metadata: &Metadata) -> bool {
         // determine at what level things will be logged at
         // TODO: make this configurable via environment variable
-        metadata.level() <= Level::Error
+        metadata.level() <= Level::Info
     }
 
     fn log(&self, record: &Record) {
@@ -28,7 +29,12 @@ impl log::Log for SimpleLogger {
                 Level::Debug => format!("{}", record.level()).bold().green(),
                 Level::Trace => format!("{}", record.level()).bold().cyan(),
             };
-            println!("({})[{}] {}", Local::now().to_rfc2822(), level, record.args());
+            println!(
+                "({})[{}] {}",
+                Local::now().to_rfc2822(),
+                level,
+                record.args()
+            );
         }
     }
 
@@ -37,7 +43,7 @@ impl log::Log for SimpleLogger {
 
 #[derive(Parser)]
 struct Args {
-    #[arg(short='p', long="port")]
+    #[arg(short = 'p', long = "port")]
     port: Option<String>,
 }
 
@@ -53,18 +59,15 @@ struct CpuQuery {
     pub name: String,
 }
 
-/// This handler accepts a json in the form of a [CpuQuery]
-/// ```json
-/// {
-///     "name": "SEARCH_QUERY"
-/// }
-/// ```
+/// This handler accepts a `GET` request to `/api/cpus/?name=[CPU_NAME]`.
 /// It relies on a globally shared [AppState] to re-use the cpu cache, and responds to the request with a serialized [Cpu].
 /// It will always attempt to find a cpu, and should always return a cpu. The correctness of the return value is not guaranteed.
-async fn get_cpu_handler(State(state): State<AppState>, Json(query): Json<CpuQuery>) -> Json<Cpu> {
+async fn get_cpu_handler(
+    State(state): State<AppState>,
+    Query(query): Query<CpuQuery>,
+) -> Json<Cpu> {
     // just to get type annotations working
     let mut state: AppState = state;
-
     Json(state.cpu_cache.find(&query.name))
 }
 
@@ -72,17 +75,18 @@ async fn get_cpu_handler(State(state): State<AppState>, Json(query): Json<CpuQue
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // initialize logging
     log::set_logger(&LOGGER)
-    .map(|()| log::set_max_level(LevelFilter::Info)).unwrap();
+        .map(|()| log::set_max_level(LevelFilter::Info))
+        .unwrap();
     let cli_args = Args::parse();
     info!("Application started");
     // parse command line arguments
     // create a new http router and register respective routes and handlers
     let app = Router::new()
-        .route("/api/cpus", get(get_cpu_handler))
+        .route("/api/cpus/", get(get_cpu_handler))
         .with_state(AppState {
             cpu_cache: CpuCache::new(),
         });
-    
+
     let mut port: String = String::from("3000");
     if let Ok(value) = env::var("HWAPI_PORT") {
         port = value;
@@ -92,7 +96,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     info!("Listening on port {}", port);
     // run the app
-    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port)).await.unwrap();
+    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port))
+        .await
+        .unwrap();
     axum::serve(listener, app).await.unwrap();
 
     Ok(())
