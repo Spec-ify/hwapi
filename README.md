@@ -30,18 +30,12 @@ cargo test
 By default, the application listens on port `3000`, although that can be configured by setting the `HWAPI_PORT` environment variable or by passing `-p`/`--port`.
 
 ## Endpoints
-To interact with the cpu api, submit a `GET` request to `/api/cpus` with a `Content-Type` of `application/json`.
+To interact with the cpu api, submit a `GET` request to `/api/cpus/?name=[CPU_NAME]`, where `[CPU_NAME]` is the HTTP encoded name of the cpu.
 
-The json submitted should look like this:
-```json
-{
-  "name": "CPU_TO_LOOK_UP"
-}
-```
 
 This endpoint does not guarantee the correctness of the model returned, it will always attempt to return a model.
 
 Here's an example curl request:
 ```
-curl -X GET -H "Content-Type: application/json" -d '{"name": "Intel Core i9-9900k"}'
+curl "http://localhost:3000/api/cpus/?name=Intel%20Core%20i9-9900k"
 ```
