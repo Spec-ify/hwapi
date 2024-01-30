@@ -120,7 +120,14 @@ fn find_model(input: &str) -> String {
         }
     }
 
-    // 
+    // Ryzen PRO cpus have the same model, they're a different lineup though.
+    // This is handled by taping PRO to the model
+    {
+        if input.contains("AMD") && input.contains("PRO") {
+            return format!("PRO {}", best_fit);
+        }
+    }
+    
     best_fit.to_string()
 }
 
@@ -170,7 +177,7 @@ mod tests {
             ("AMD Ryzen™ 5 5600", "AMD Ryzen 5 5600 6-Core Processor"),
             ("AMD Ryzen™ 5 2600", "AMD Ryzen 5 2600 Six-Core Processor"),
             ("AMD Ryzen™ 5 7600", "AMD Ryzen 5 7600 6-Core Processor"),
-            // ("AMD Ryzen™ 5 7530U", "AMD Ryzen 5 7530U with Radeon Graphics"),
+            ("AMD Ryzen™ 5 7530U", "AMD Ryzen 5 7530U with Radeon Graphics"),
             (
                 "Intel® Core™ i9-9900K Processor",
                 "Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz",
