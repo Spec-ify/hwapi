@@ -68,14 +68,17 @@ impl CpuCache {
             attributes: HashMap::new(),
         };
         let mut best_score: usize = 10000;
+        println!("input model: {}", input_model);
         for cpu in cpus {
             let model: String = find_model(&cpu.name).to_string();
             // levenshtein distance is used to figure out how similar two strings are
             // 0 means that they're identical, the higher the number, the less similar they are
-            let score = levenshtein(input_model, &model);
+            let score = levenshtein(&input_model, &model);
             if score < best_score {
                 best_score = score;
                 best_fit = cpu.clone();
+
+                println!("Best fit of {} found, with a score of {}", best_fit.name, best_score);
             }
         }
         self.comparison_cache
@@ -90,7 +93,7 @@ impl CpuCache {
 
 /// Search the input string for the section that refers to the model of a CPU.
 /// For example, given an input string of "AMD Ryzen 5 3600", it would try to return "3600"
-fn find_model(input: &str) -> &str {
+fn find_model(input: &str) -> String {
     // TODO: some models have spaces in them, eg "5600 PRO"
     let mut best_fit = "";
     let mut high_score: isize = -10;
@@ -101,7 +104,24 @@ fn find_model(input: &str) -> &str {
             high_score = score;
         }
     }
-    best_fit
+    // best_fit
+    // because some edge cases exist where the model is either vaguely reported or split among multiple tokens, those are handled here
+    // they are organized by blocks, each block should contain an explanation and a solution
+
+    // 14th gen intel CPUs are reported in the form of `iX processor 14XYZ` by the database, but they're reported as
+    // iX-14XYZ by the WMI. For now, this is handled by hacking iX and 14XYZ together if the case is detected
+    {
+        if input.contains("Intel") && best_fit.starts_with("14") {
+            let tokens = input.split(' ');
+            let i_tag = tokens.filter(|t| t.len() == 2 && t.starts_with('i')).nth(0);
+            if let Some(t) = i_tag {
+                return format!("{}-{}", t, best_fit);
+            }
+        }
+    }
+
+    // 
+    best_fit.to_string()
 }
 
 /// This function tries to determine the likelihood that the given token is the "model" of a cpu.
@@ -155,11 +175,13 @@ mod tests {
                 "Intel® Core™ i9-9900K Processor",
                 "Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz",
             ),
+            ("Intel® Core™ i7 processor 14700K", "Intel(R) Core(TM) i7-14700K")
+
         ];
 
         for pairing in pairings {
             let found_cpu = cache.find(pairing.1);
-            assert_eq!(found_cpu.name, pairing.0);
+            assert_eq!(found_cpu.name, pairing.0, "With an input of {:?}, a database result of {:?} was expected, while {:?} was returned instead.", pairing.1, pairing.0, found_cpu.name);
         }
     }
 }
