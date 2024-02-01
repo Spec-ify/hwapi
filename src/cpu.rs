@@ -29,6 +29,9 @@ impl CpuCache {
     /// Create a new cache and parse the cpu databases into memory
     pub fn new() -> Self {
         let intel_cpus = get_intel_cpus();
+        // for cpu in intel_cpus.clone() {
+        //     println!("{:#?}", cpu);
+        // }
         debug!("Intel CPU list deserialized");
         let amd_cpus = get_amd_cpus();
         debug!("Amd CPU list deserialized");

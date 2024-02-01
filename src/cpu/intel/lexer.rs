@@ -26,14 +26,18 @@ pub fn lex_csv<'a>(input: &'a str) -> Result<LexerOutput, Box<dyn Error + 'a>> {
     let mut iterated_output =
         read_section(cpu_combinator_output.0).expect("Failed to read first section");
     while !iterated_output.0.is_empty() {
-        // println!("iterated output: {:?}", iterated_output);
         serialized_records.push(iterated_output.1);
         iterated_output = read_section(iterated_output.0)?;
     }
     // iterate over all of the serialized records and deserialize them
     let mut deserialized_records: Vec<Vec<&str>> = Vec::with_capacity(256);
     for serialized_record in serialized_records {
-        deserialized_records.push(read_record(serialized_record)?.1);
+        // this variable is iterated over until all sections are read from
+        let mut iterated_output = read_record(serialized_record)?;
+        while !iterated_output.0.is_empty() {
+            deserialized_records.push(iterated_output.1);
+            iterated_output = read_record(iterated_output.0)?;
+        }
     }
 
     Ok(LexerOutput {

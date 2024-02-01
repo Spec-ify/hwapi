@@ -13,6 +13,7 @@ pub fn parse_csv(csv: &'_ str) -> Result<Vec<Cpu>, Box<dyn Error + '_>> {
             attributes: HashMap::with_capacity(256),
         };
         for record in lexer_output.records.clone() {
+            // println!("{:#?}", record[0].to_string());
             // the first item in each record is the label, the items are in columns with the cpus
             let entry = record[i + 1];
             if !entry.is_empty() {
