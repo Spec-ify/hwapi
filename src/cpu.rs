@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use levenshtein::levenshtein;
-use log::debug;
+use log::{debug, trace};
 use serde::Serialize;
 mod amd;
 mod intel;
@@ -71,7 +71,7 @@ impl CpuCache {
             attributes: HashMap::new(),
         };
         let mut best_score: usize = 10000;
-        println!("input model: {}", input_model);
+        trace!("input model: {}", input_model);
         for cpu in cpus {
             let model: String = find_model(&cpu.name).to_string();
             // levenshtein distance is used to figure out how similar two strings are
@@ -81,7 +81,11 @@ impl CpuCache {
                 best_score = score;
                 best_fit = cpu.clone();
 
-                println!("Best fit of {} found, with a score of {}", best_fit.name, best_score);
+                trace!(
+                    "Best fit of {} found, with a score of {}",
+                    best_fit.name,
+                    best_score
+                );
             }
         }
         self.comparison_cache
@@ -130,7 +134,7 @@ fn find_model(input: &str) -> String {
             return format!("PRO {}", best_fit);
         }
     }
-    
+
     best_fit.to_string()
 }
 
@@ -180,13 +184,18 @@ mod tests {
             ("AMD Ryzen™ 5 5600", "AMD Ryzen 5 5600 6-Core Processor"),
             ("AMD Ryzen™ 5 2600", "AMD Ryzen 5 2600 Six-Core Processor"),
             ("AMD Ryzen™ 5 7600", "AMD Ryzen 5 7600 6-Core Processor"),
-            ("AMD Ryzen™ 5 7530U", "AMD Ryzen 5 7530U with Radeon Graphics"),
+            (
+                "AMD Ryzen™ 5 7530U",
+                "AMD Ryzen 5 7530U with Radeon Graphics",
+            ),
             (
                 "Intel® Core™ i9-9900K Processor",
                 "Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz",
             ),
-            ("Intel® Core™ i7 processor 14700K", "Intel(R) Core(TM) i7-14700K")
-
+            (
+                "Intel® Core™ i7 processor 14700K",
+                "Intel(R) Core(TM) i7-14700K",
+            ),
         ];
 
         for pairing in pairings {

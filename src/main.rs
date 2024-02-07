@@ -1,4 +1,5 @@
 mod cpu;
+mod usb;
 
 use axum::extract::Query;
 use axum::http::HeaderValue;
@@ -12,6 +13,7 @@ use log::{Level, LevelFilter, Metadata, Record};
 use serde::{Deserialize, Serialize};
 use std::env;
 use tower_http::cors::CorsLayer;
+use usb::UsbCache;
 /// https://docs.rs/log/latest/log/#implementing-a-logger
 struct SimpleLogger;
 
@@ -54,6 +56,32 @@ static LOGGER: SimpleLogger = SimpleLogger;
 #[derive(Clone)]
 struct AppState {
     pub cpu_cache: CpuCache,
+    pub usb_cache: UsbCache,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+struct UsbQuery {
+    pub identifier: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+struct UsbResponse {
+    pub vendor: Option<String>,
+    pub device: Option<String>,
+}
+
+/// This handler accepts a `GET` request to `/api/usbs/?identifier.
+/// It relies on a globally shared [AppState] to re-use the usb cache.
+async fn get_usb_handler(
+    State(state): State<AppState>,
+    Query(query): Query<UsbQuery>,
+) -> Json<UsbResponse> {
+    // TODO: update docs
+    let results = state.usb_cache.find(&query.identifier);
+    Json(UsbResponse {
+        vendor: results.0.map(|v| v.name),
+        device: results.1.map(|d| d.name),
+    })
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -65,11 +93,9 @@ struct CpuQuery {
 /// It relies on a globally shared [AppState] to re-use the cpu cache, and responds to the request with a serialized [Cpu].
 /// It will always attempt to find a cpu, and should always return a cpu. The correctness of the return value is not guaranteed.
 async fn get_cpu_handler(
-    State(state): State<AppState>,
+    State(mut state): State<AppState>,
     Query(query): Query<CpuQuery>,
 ) -> Json<Cpu> {
-    // just to get type annotations working
-    let mut state: AppState = state;
     Json(state.cpu_cache.find(&query.name))
 }
 
@@ -85,9 +111,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // create a new http router and register respective routes and handlers
     let app = Router::new()
         .route("/api/cpus/", get(get_cpu_handler))
+        .route("/api/usbs/", get(get_usb_handler))
         .layer(CorsLayer::new().allow_origin("*".parse::<HeaderValue>().unwrap()))
         .with_state(AppState {
             cpu_cache: CpuCache::new(),
+            usb_cache: UsbCache::new(),
         });
 
     let mut port: String = String::from("3000");
