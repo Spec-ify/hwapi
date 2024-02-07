@@ -1,3 +1,10 @@
+# HWAPI
+This API provides a backend for fetching information about hardware.
+
+Current information fetched includes:
+- CPU info (Intel ARK, AMD Product Database)
+- USB info (VID/PID mapping)
+
 ## Building
 Building this project requires installing the rust toolchain.
 
