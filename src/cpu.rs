@@ -29,9 +29,9 @@ impl CpuCache {
     /// Create a new cache and parse the cpu databases into memory
     pub fn new() -> Self {
         let intel_cpus = get_intel_cpus();
-        // for cpu in intel_cpus.clone() {
-        //     println!("{:#?}", cpu);
-        // }
+        for cpu in intel_cpus.clone() {
+            println!("{}", cpu.name);
+        }
         debug!("Intel CPU list deserialized");
         let amd_cpus = get_amd_cpus();
         debug!("Amd CPU list deserialized");
@@ -111,7 +111,6 @@ fn find_model(input: &str) -> String {
             high_score = score;
         }
     }
-    // best_fit
     // because some edge cases exist where the model is either vaguely reported or split among multiple tokens, those are handled here
     // they are organized by blocks, each block should contain an explanation and a solution
 
@@ -132,6 +131,19 @@ fn find_model(input: &str) -> String {
     {
         if input.contains("AMD") && input.contains("PRO") {
             return format!("PRO {}", best_fit);
+        }
+    }
+
+    // Intel Core iX-123M processors are sometimes represented in the format of
+    // iX CPU M 123
+    {
+        if input.contains("Intel") && input.contains(" M ") && best_fit.len() == 3 {
+            let tokens = input.split(" ");
+            let i_tag = tokens.filter(|t| t.len() == 2 && t.starts_with('i')).nth(0);
+            if let Some(t) = i_tag {
+                return format!("{}-{}M", t, best_fit);
+
+            }
         }
     }
 
@@ -195,6 +207,10 @@ mod tests {
             (
                 "Intel® Core™ i7 processor 14700K",
                 "Intel(R) Core(TM) i7-14700K",
+            ),
+            (
+                "Intel® Core™ i7-620M Processor",
+                "Intel(R) Core(TM) i7 CPU M 620 @ 2.67Ghz"
             ),
         ];
 

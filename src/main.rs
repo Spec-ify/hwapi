@@ -1,5 +1,6 @@
 mod cpu;
 mod usb;
+mod pcie;
 
 use axum::extract::Query;
 use axum::http::HeaderValue;
