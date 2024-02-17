@@ -1,8 +1,8 @@
-use crate::NomError;
 use nom::bytes::complete::{tag, take, take_until};
 use nom::character::complete::char;
 use nom::sequence::{delimited, preceded, terminated};
 use nom::IResult;
+use crate::NomError;
 
 // the input file was obtained from https://pci-ids.ucw.cz/
 const FILE_INPUT: &str = include_str!("./pci.ids.txt");
@@ -10,7 +10,7 @@ const FILE_INPUT: &str = include_str!("./pci.ids.txt");
 /// Vendors are at the root of the file
 #[derive(PartialEq, Debug, Clone)]
 pub struct Vendor {
-    pub id: String,
+    pub id: u16,
     pub name: String,
     pub devices: Vec<Device>,
 }
@@ -19,7 +19,7 @@ pub struct Vendor {
 /// and are marked with one tab before, the device ID, then two spaces and the device name
 #[derive(PartialEq, Debug, Clone)]
 pub struct Device {
-    pub id: String,
+    pub id: u16,
     pub name: String,
     pub subsystems: Vec<Subsystem>,
 }
@@ -29,7 +29,7 @@ pub struct Device {
 /// then two spaces, then the name of the subsystem
 #[derive(PartialEq, Debug, Clone)]
 pub struct Subsystem {
-    pub id: String,
+    pub id: u16,
     pub name: String,
 }
 
@@ -92,7 +92,7 @@ impl PcieCache {
 /// Output is returned as a tuple of (`vendor`, `device`, `subsystem`)
 fn parse_device_identifier<'a>(
     input: &'a str,
-) -> Result<(&'a str, &'a str, Option<&'a str>), NomError<'a>> {
+) -> Result<(u16, u16, Option<u16>), NomError<'a>> {
     // TODO: validate that ids are hex strings
     let vid_combinator = delimited(tag("PCI\\VEN_"), take(4 as u8), char('&'))(input)?;
     // https://learn.microsoft.com/en-us/windows-hardware/drivers/install/identifiers-for-pci-devices
@@ -103,7 +103,7 @@ fn parse_device_identifier<'a>(
         ssid = Some(ssid_combinator.1);
     }
 
-    Ok((vid_combinator.1, did_combinator.1, ssid))
+    Ok((u16::from_str_radix(vid_combinator.1, 16).unwrap(), u16::from_str_radix(did_combinator.1, 16).unwrap(), ssid.map(|s| u16::from_str_radix(s, 16).unwrap())))
 }
 
 /// Read the database from the file into memory
@@ -158,7 +158,7 @@ fn read_vendor(input: &str) -> IResult<&str, Vendor> {
     Ok((
         leftover,
         Vendor {
-            id: String::from(vid),
+            id: u16::from_str_radix(vid, 16).unwrap(),
             name: String::from(vname),
             devices,
         },
@@ -195,7 +195,7 @@ fn read_device(input: &str) -> IResult<&str, Device> {
     Ok((
         leftover,
         Device {
-            id: String::from(did),
+            id: u16::from_str_radix(did, 16).unwrap(),
             name: String::from(dname_combinator.1),
             subsystems,
         },
@@ -216,7 +216,7 @@ fn read_subsystem_line(input: &str) -> IResult<&str, Subsystem> {
     Ok((
         ss_name_combinator.0,
         Subsystem {
-            id: String::from(ssid_combinator.1),
+            id: u16::from_str_radix(ssid_combinator.1, 16).unwrap(),
             name: String::from(ss_name_combinator.1),
         },
     ))
@@ -224,10 +224,7 @@ fn read_subsystem_line(input: &str) -> IResult<&str, Subsystem> {
 
 #[cfg(test)]
 mod tests {
-    use crate::pcie::{
-        parse_device_identifier, read_device, read_subsystem_line, read_vendor, Device, Subsystem,
-        Vendor,
-    };
+    use crate::pcie::{parse_device_identifier, read_device, read_subsystem_line, read_vendor, Device, Subsystem, Vendor};
 
     use super::{parse_pcie_db, read_header, PcieCache};
 
@@ -248,7 +245,7 @@ mod tests {
             Ok((
                 "bat",
                 Subsystem {
-                    id: String::from("0001"),
+                    id: 0x0001,
                     name: String::from("foo bar")
                 }
             ))
@@ -263,7 +260,7 @@ mod tests {
             Ok((
                 "\t0002",
                 Device {
-                    id: String::from("0001"),
+                    id: 0x0001,
                     name: String::from("foo bar"),
                     subsystems: vec![]
                 }
@@ -276,10 +273,10 @@ mod tests {
             Ok((
                 "0002",
                 Device {
-                    id: String::from("0001"),
+                    id: 0x0001,
                     name: String::from("foo bar"),
                     subsystems: vec![Subsystem {
-                        id: String::from("8008"),
+                        id: 0x8008,
                         name: String::from("subsys")
                     }],
                 }
@@ -292,10 +289,10 @@ mod tests {
             Ok((
                 "0002",
                 Device {
-                    id: String::from("0001"),
+                    id: 0x0001,
                     name: String::from("foo bar"),
                     subsystems: vec![Subsystem {
-                        id: String::from("8008"),
+                        id: 0x8008,
                         name: String::from("subsys")
                     }],
                 }
@@ -311,10 +308,10 @@ mod tests {
             Ok((
                 "0002",
                 Vendor {
-                    id: String::from("0001"),
+                    id: 0x0001,
                     name: String::from("foo"),
                     devices: vec![Device {
-                        id: String::from("000a"),
+                        id: 0x000a,
                         name: String::from("bar"),
                         subsystems: vec![]
                     }]
@@ -332,35 +329,17 @@ mod tests {
     #[test]
     fn basic_parse_device_identifier() {
         // https://learn.microsoft.com/en-us/windows-hardware/drivers/install/identifiers-for-pci-devices
-        assert_eq!(
-            parse_device_identifier("PCI\\VEN_1234&DEV_5678&SUBSYS_91230000&REV_00"),
-            Ok(("1234", "5678", Some("9123")))
-        );
-        assert_eq!(
-            parse_device_identifier("PCI\\VEN_1234&DEV_5678&SUBSYS_91230000"),
-            Ok(("1234", "5678", Some("9123")))
-        );
-        assert_eq!(
-            parse_device_identifier("PCI\\VEN_1234&DEV_5678&REV_00"),
-            Ok(("1234", "5678", None))
-        );
-        assert_eq!(
-            parse_device_identifier("PCI\\VEN_1234&DEV_5678"),
-            Ok(("1234", "5678", None))
-        );
-        assert_eq!(
-            parse_device_identifier("PCI\\VEN_1234&DEV_5678&CC_112200"),
-            Ok(("1234", "5678", None))
-        );
-        assert_eq!(
-            parse_device_identifier("PCI\\VEN_1234&DEV_5678&CC_1122"),
-            Ok(("1234", "5678", None))
-        );
+        assert_eq!(parse_device_identifier("PCI\\VEN_1234&DEV_5678&SUBSYS_91230000&REV_00"), Ok((0x1234, 0x5678, Some(0x9123))));
+        assert_eq!(parse_device_identifier("PCI\\VEN_1234&DEV_5678&SUBSYS_91230000"),        Ok((0x1234, 0x5678, Some(0x9123))));
+        assert_eq!(parse_device_identifier("PCI\\VEN_1234&DEV_5678&REV_00"),                 Ok((0x1234, 0x5678, None)));
+        assert_eq!(parse_device_identifier("PCI\\VEN_1234&DEV_5678"),                        Ok((0x1234, 0x5678, None)));
+        assert_eq!(parse_device_identifier("PCI\\VEN_1234&DEV_5678&CC_112200"),              Ok((0x1234, 0x5678, None)));
+        assert_eq!(parse_device_identifier("PCI\\VEN_1234&DEV_5678&CC_1122"),                Ok((0x1234, 0x5678, None)));
     }
 
-    // #[test]
-    // fn basic_find_device() {
-    //     let cache = PcieCache::new();
-    //     // println!("{:#?}", cache.find("PCI\\VEN_1022&DEV_1633&SUBSYS_14531022&REV_00\\3&2411E6FE&1&09").map(|t| t.1));
-    // }
+    #[test]
+    fn basic_find_device() {
+        let cache = PcieCache::new();
+        println!("{:#?}", cache.find("PCI\\VEN_1022&DEV_1633&SUBSYS_14531022&REV_00\\3&2411E6FE&1&09").map(|t| t.1));
+    }
 }

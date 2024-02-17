@@ -12,14 +12,14 @@ const INPUT_FILE: &[u8] = include_bytes!("usb.ids.txt");
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Vendor {
-    pub id: String,
+    pub id: u16,
     pub name: String,
     pub devices: Vec<Device>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Device {
-    pub id: String,
+    pub id: u16,
     pub name: String,
 }
 
@@ -70,13 +70,12 @@ impl UsbCache {
 /// Input strings in the form of `USB\VID_1234&PID_5678\9479493` are assumed.
 /// It returns a tuple, where the first value is the vendor id, and the second is the product id. This tuple contains substrings of the initial input string,
 /// so handle lifetimes accordingly.
-fn parse_device_identifier(device_string: &str) -> Result<(&str, &str), NomError> {
+fn parse_device_identifier(device_string: &str) -> Result<(u16, u16), NomError> {
     // https://learn.microsoft.com/en-us/windows-hardware/drivers/install/standard-usb-identifiers
     // TODO: this does not fully support all formats of usb device identifiers
     let vid_combinator = delimited(tag("USB\\VID_"), take(4 as u8), take(1 as u8))(device_string)?;
     let pid_combinator = preceded(tag("PID_"), take(4 as u8))(vid_combinator.0)?;
-    // TODO: assert that the found values were actually valid hexadecimal strings
-    Ok((vid_combinator.1, pid_combinator.1))
+    Ok((u16::from_str_radix(vid_combinator.1, 16).unwrap(), u16::from_str_radix(pid_combinator.1, 16).unwrap()))
 }
 
 fn parse_usb_db() -> Vec<Vendor> {
@@ -137,7 +136,7 @@ fn read_vendor(input: &str) -> IResult<&str, Vendor> {
     Ok((
         leftover,
         Vendor {
-            id: vid.to_string(),
+            id: u16::from_str_radix(vid, 16).unwrap(),
             name: vname.to_string(),
             devices,
         },
@@ -153,7 +152,7 @@ fn read_device_line(input: &str) -> IResult<&str, Device> {
     Ok((
         combinator_output.0,
         Device {
-            id: String::from(did_combinator_output.1),
+            id: u16::from_str_radix(did_combinator_output.1, 16).unwrap(),
             name: String::from(dname),
         },
     ))
@@ -170,7 +169,7 @@ mod tests {
         let mock_device_string = "USB\\VID_1234&PID_5678\\9479493";
         assert_eq!(
             parse_device_identifier(mock_device_string),
-            Ok(("1234", "5678"))
+            Ok((0x1234, 0x5678))
         );
     }
 
@@ -187,10 +186,10 @@ mod tests {
     fn basic_read_vendor() {
         let mock_section = "1234  vendor_name\n\t5678  device_name\n9123";
         let expected_output = Vendor {
-            id: String::from("1234"),
+            id: 0x1234,
             name: String::from("vendor_name"),
             devices: vec![Device {
-                id: String::from("5678"),
+                id: 0x5678,
                 name: String::from("device_name"),
             }],
         };
@@ -201,7 +200,7 @@ mod tests {
     fn read_section_no_devices() {
         let mock_section = "1234  vendor_name\n5678";
         let expected_output = Vendor {
-            id: String::from("1234"),
+            id: 0x1234,
             name: String::from("vendor_name"),
             devices: vec![],
         };
@@ -213,7 +212,7 @@ mod tests {
             Ok((
                 "4567",
                 Device {
-                    id: String::from("1234"),
+                    id: 0x1234,
                     name: String::from("foo bar")
                 }
             ))
@@ -224,4 +223,5 @@ mod tests {
     fn basic_parse_usbs() {
         parse_usb_db();
     }
+
 }
