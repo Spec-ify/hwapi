@@ -9,7 +9,7 @@ use chrono::Local;
 use clap::Parser;
 use colored::*;
 use cpu::{Cpu, CpuCache};
-use log::info;
+use log::{error, info};
 use log::{Level, LevelFilter, Metadata, Record};
 use pcie::PcieCache;
 use serde::{Deserialize, Serialize};
@@ -77,7 +77,7 @@ struct UsbResponse {
     pub device: Option<String>,
 }
 
-/// This handler accepts a `GET` request to `/api/usbs/?identifier.
+/// This handler accepts a `GET` request to `/api/usbs/?identifier`.
 /// It relies on a globally shared [AppState] to re-use the usb cache.
 async fn get_usb_handler(
     State(state): State<AppState>,
@@ -90,7 +90,10 @@ async fn get_usb_handler(
             vendor: r.0.map(|v| v.name),
             device: r.1.map(|d| d.name),
         })),
-        Err(_) => Err(StatusCode::NOT_FOUND),
+        Err(e) => {
+            error!("usb error: {:?} caused by query: {:?}", e, query);
+            Err(StatusCode::NOT_FOUND)
+        },
     }
 }
 
@@ -119,7 +122,10 @@ async fn get_pcie_handler(
             device: r.1.map(|d| d.name),
             subsystem: r.2.map(|s| s.name),
         })),
-        Err(_) => Err(StatusCode::NOT_FOUND),
+        Err(e) => {
+            error!("pcie error: {:?} caused by query: {:?}", e, query);
+            Err(StatusCode::NOT_FOUND)
+        }
     }
 }
 
@@ -151,7 +157,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let app = Router::new()
         .route("/api/cpus/", get(get_cpu_handler))
         .route("/api/usbs/", get(get_usb_handler))
-        .route("/api/pcie", get(get_pcie_handler))
+        .route("/api/pcie/", get(get_pcie_handler))
         .layer(CorsLayer::new().allow_origin("*".parse::<HeaderValue>().unwrap()))
         .with_state(AppState {
             cpu_cache: CpuCache::new(),

@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use levenshtein::levenshtein;
 use log::{debug, trace};
@@ -16,6 +16,21 @@ pub struct Cpu {
     pub name: String,
     /// A list of attributes, examples might include a core count of 8, or whether or not a certain feature is enabled
     pub attributes: HashMap<String, String>,
+}
+
+struct IndexEntry {
+    /// The primary identifier for a processor, like:
+    /// - `14900` in `i9-14900k`
+    model: String,
+    /// A list of modifiers applied directly to the processor number, like:
+    /// - `F` in `i5-11400F`
+    /// - `i7-` in `i7-7600`
+    prefixes: String,
+    /// Similar to modifiers, but they're not directly a part of the processor, like:
+    /// `PRO` in `Ryzen 5 PRO 5600`
+    tags: HashSet<String>,
+    /// The index of the corresponding cpu in the "full" vec
+    index: usize,
 }
 
 #[derive(Clone)]
@@ -95,8 +110,17 @@ impl CpuCache {
     }
 }
 
+///
+fn generate_index_entry(name: &str) -> IndexEntry {
+    let model_token = find_model(name);
+
+    todo!()
+}
+
 /// Search the input string for the section that refers to the model of a CPU.
-/// For example, given an input string of "AMD Ryzen 5 3600", it would try to return "3600"
+/// For example, given an input string of "AMD Ryzen 5 3600", it would try to return "3600".
+/// This function does return the whole token associated with a model, so prefixes and suffixes
+/// are included
 fn find_model(input: &str) -> String {
     let mut best_fit = "";
     let mut high_score: isize = -10;

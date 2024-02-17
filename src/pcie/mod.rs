@@ -1,8 +1,8 @@
+use crate::NomError;
 use nom::bytes::complete::{tag, take, take_until};
 use nom::character::complete::char;
 use nom::sequence::{delimited, preceded, terminated};
 use nom::IResult;
-use crate::NomError;
 
 // the input file was obtained from https://pci-ids.ucw.cz/
 const FILE_INPUT: &str = include_str!("./pci.ids.txt");
@@ -224,9 +224,12 @@ fn read_subsystem_line(input: &str) -> IResult<&str, Subsystem> {
 
 #[cfg(test)]
 mod tests {
-    use crate::pcie::{parse_device_identifier, read_device, read_subsystem_line, read_vendor, Device, Subsystem, Vendor};
+    use crate::pcie::{
+        parse_device_identifier, read_device, read_subsystem_line, read_vendor, Device, Subsystem,
+        Vendor,
+    };
 
-    use super::{parse_pcie_db, read_header};
+    use super::{parse_pcie_db, read_header, PcieCache};
 
     #[test]
     fn basic_read_header() {
@@ -329,11 +332,35 @@ mod tests {
     #[test]
     fn basic_parse_device_identifier() {
         // https://learn.microsoft.com/en-us/windows-hardware/drivers/install/identifiers-for-pci-devices
-        assert_eq!(parse_device_identifier("PCI\\VEN_1234&DEV_5678&SUBSYS_91230000&REV_00"), Ok(("1234", "5678", Some("9123"))));
-        assert_eq!(parse_device_identifier("PCI\\VEN_1234&DEV_5678&SUBSYS_91230000"),        Ok(("1234", "5678", Some("9123"))));
-        assert_eq!(parse_device_identifier("PCI\\VEN_1234&DEV_5678&REV_00"),                 Ok(("1234", "5678", None)));
-        assert_eq!(parse_device_identifier("PCI\\VEN_1234&DEV_5678"),                        Ok(("1234", "5678", None)));
-        assert_eq!(parse_device_identifier("PCI\\VEN_1234&DEV_5678&CC_112200"),              Ok(("1234", "5678", None)));
-        assert_eq!(parse_device_identifier("PCI\\VEN_1234&DEV_5678&CC_1122"),                Ok(("1234", "5678", None)));
+        assert_eq!(
+            parse_device_identifier("PCI\\VEN_1234&DEV_5678&SUBSYS_91230000&REV_00"),
+            Ok(("1234", "5678", Some("9123")))
+        );
+        assert_eq!(
+            parse_device_identifier("PCI\\VEN_1234&DEV_5678&SUBSYS_91230000"),
+            Ok(("1234", "5678", Some("9123")))
+        );
+        assert_eq!(
+            parse_device_identifier("PCI\\VEN_1234&DEV_5678&REV_00"),
+            Ok(("1234", "5678", None))
+        );
+        assert_eq!(
+            parse_device_identifier("PCI\\VEN_1234&DEV_5678"),
+            Ok(("1234", "5678", None))
+        );
+        assert_eq!(
+            parse_device_identifier("PCI\\VEN_1234&DEV_5678&CC_112200"),
+            Ok(("1234", "5678", None))
+        );
+        assert_eq!(
+            parse_device_identifier("PCI\\VEN_1234&DEV_5678&CC_1122"),
+            Ok(("1234", "5678", None))
+        );
     }
+
+    // #[test]
+    // fn basic_find_device() {
+    //     let cache = PcieCache::new();
+    //     // println!("{:#?}", cache.find("PCI\\VEN_1022&DEV_1633&SUBSYS_14531022&REV_00\\3&2411E6FE&1&09").map(|t| t.1));
+    // }
 }
