@@ -101,7 +101,6 @@ impl CpuCache {
 /// Search the input string for the section that refers to the model of a CPU.
 /// For example, given an input string of "AMD Ryzen 5 3600", it would try to return "3600"
 fn find_model(input: &str) -> String {
-    // TODO: some models have spaces in them, eg "5600 PRO"
     let mut best_fit = "";
     let mut high_score: isize = -10;
     for token in input.split(' ') {
@@ -142,7 +141,6 @@ fn find_model(input: &str) -> String {
             let i_tag = tokens.filter(|t| t.len() == 2 && t.starts_with('i')).nth(0);
             if let Some(t) = i_tag {
                 return format!("{}-{}M", t, best_fit);
-
             }
         }
     }
@@ -210,7 +208,7 @@ mod tests {
             ),
             (
                 "Intel® Core™ i7-620M Processor",
-                "Intel(R) Core(TM) i7 CPU M 620 @ 2.67Ghz"
+                "Intel(R) Core(TM) i7 CPU M 620 @ 2.67Ghz",
             ),
         ];
 

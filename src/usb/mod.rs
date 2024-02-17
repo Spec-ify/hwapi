@@ -3,6 +3,8 @@ use nom::character::complete::char;
 use nom::sequence::{delimited, preceded};
 use nom::IResult;
 
+use crate::NomError;
+
 // The input file was obtained from http://www.linux-usb.org/
 // note: only vendors and devices are currently read from the file, there's extra crap at the bottom that might be useful
 // This file contains one or two invalid utf 8 characters, so it's parsed slightly differently
@@ -29,32 +31,38 @@ pub struct UsbCache {
 impl UsbCache {
     pub fn new() -> Self {
         Self {
-            vendors: parse_usbs(),
+            vendors: parse_usb_db(),
         }
     }
 
     /// Search the cache for the provided input string, returning the found device info, if it exists. If the `Option<Vendor>` is `None`,
     /// you can assume that the device info will also be `None`.
-    pub fn find(&self, input: &str) -> (Option<Vendor>, Option<Device>) {
-        let found_stuff = parse_device_identifier(input).unwrap();
+    ///
+    /// TODO: this function calls unwrap on a very fallible function, change function
+    /// to return a Result, you could then make it so that vendor and device aren't options
+    pub fn find<'a>(
+        &'a self,
+        input: &'a str,
+    ) -> Result<(Option<Vendor>, Option<Device>), NomError<'a>> {
+        let parsed_identifier = parse_device_identifier(input)?;
         // first search for a vendor
         let matching_vendor = self
             .vendors
             .iter()
-            .filter(|ven| ven.id == found_stuff.0)
+            .filter(|ven| ven.id == parsed_identifier.0)
             .nth(0);
-        let mut matching_device: Option<Device> = None;
-        // if a vendor was found
+
+        let mut device: Option<Device> = None;
         if let Some(vendor) = matching_vendor {
-            matching_device = vendor
+            device = vendor
                 .devices
                 .iter()
-                .filter(|dev| dev.id == found_stuff.1)
+                .filter(|dev| dev.id == parsed_identifier.1)
                 .nth(0)
                 .cloned();
         }
-        // if nothing was found
-        (matching_vendor.cloned(), matching_device)
+
+        Ok((matching_vendor.cloned(), device))
     }
 }
 
@@ -62,27 +70,26 @@ impl UsbCache {
 /// Input strings in the form of `USB\VID_1234&PID_5678\9479493` are assumed.
 /// It returns a tuple, where the first value is the vendor id, and the second is the product id. This tuple contains substrings of the initial input string,
 /// so handle lifetimes accordingly.
-fn parse_device_identifier(
-    device_string: &str,
-) -> Result<(&str, &str), nom::Err<nom::error::Error<&str>>> {
+fn parse_device_identifier(device_string: &str) -> Result<(&str, &str), NomError> {
+    // https://learn.microsoft.com/en-us/windows-hardware/drivers/install/standard-usb-identifiers
+    // TODO: this does not fully support all formats of usb device identifiers
     let vid_combinator = delimited(tag("USB\\VID_"), take(4 as u8), take(1 as u8))(device_string)?;
     let pid_combinator = preceded(tag("PID_"), take(4 as u8))(vid_combinator.0)?;
     // TODO: assert that the found values were actually valid hexadecimal strings
     Ok((vid_combinator.1, pid_combinator.1))
 }
 
-fn parse_usbs() -> Vec<Vendor> {
+fn parse_usb_db() -> Vec<Vendor> {
     // this is kind of awful, but there's an invalid utf 8 character at byte 703748,
     // so we just stop before then, because it's past the section we care about
     let file_as_str = std::str::from_utf8(&INPUT_FILE[0..703_748]).unwrap();
     let header_combinator_output = read_header(file_as_str).unwrap();
     let mut output: Vec<Vendor> = Vec::with_capacity(1024);
-
-    let mut iterated_output = read_section(header_combinator_output.0);
+    let mut iterated_output = read_vendor(header_combinator_output.0);
     loop {
         if let Ok(ref section_output) = iterated_output {
             output.push(section_output.1.clone());
-            iterated_output = read_section(section_output.0);
+            iterated_output = read_vendor(section_output.0);
         } else {
             break;
         }
@@ -99,7 +106,7 @@ fn read_header(input: &str) -> IResult<&str, &str> {
 }
 
 /// This combinator reads a a vendor and all of the associated ids from the file
-fn read_section(input: &str) -> IResult<&str, Vendor> {
+fn read_vendor(input: &str) -> IResult<&str, Vendor> {
     // read the vendor id and vendor name
     let vid_combinator_output = take(4 as u8)(input)?;
     let vid = vid_combinator_output.1;
@@ -155,7 +162,7 @@ fn read_device_line(input: &str) -> IResult<&str, Device> {
 #[cfg(test)]
 mod tests {
     use super::parse_device_identifier;
-    use super::{parse_usbs, read_section};
+    use super::{parse_usb_db, read_vendor};
     use super::{read_device_line, read_header, Device, Vendor};
 
     #[test]
@@ -177,7 +184,7 @@ mod tests {
     }
 
     #[test]
-    fn basic_read_section() {
+    fn basic_read_vendor() {
         let mock_section = "1234  vendor_name\n\t5678  device_name\n9123";
         let expected_output = Vendor {
             id: String::from("1234"),
@@ -187,7 +194,7 @@ mod tests {
                 name: String::from("device_name"),
             }],
         };
-        assert_eq!(read_section(mock_section), Ok(("9123", expected_output)));
+        assert_eq!(read_vendor(mock_section), Ok(("9123", expected_output)));
     }
 
     #[test]
@@ -198,11 +205,7 @@ mod tests {
             name: String::from("vendor_name"),
             devices: vec![],
         };
-        assert_eq!(read_section(mock_section), Ok(("5678", expected_output)));
-    }
-
-    #[test]
-    fn basic_read_device() {
+        assert_eq!(read_vendor(mock_section), Ok(("5678", expected_output)));
         // first make sure we can read a normal device without issue
         let mock_device_entry = "\t1234  foo bar\n4567";
         assert_eq!(
@@ -219,6 +222,6 @@ mod tests {
 
     #[test]
     fn basic_parse_usbs() {
-        parse_usbs();
+        parse_usb_db();
     }
 }

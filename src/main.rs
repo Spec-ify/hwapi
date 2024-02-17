@@ -1,9 +1,9 @@
 mod cpu;
-mod usb;
 mod pcie;
+mod usb;
 
 use axum::extract::Query;
-use axum::http::HeaderValue;
+use axum::http::{HeaderValue, StatusCode};
 use axum::{extract::State, routing::get, Json, Router};
 use chrono::Local;
 use clap::Parser;
@@ -11,10 +11,15 @@ use colored::*;
 use cpu::{Cpu, CpuCache};
 use log::info;
 use log::{Level, LevelFilter, Metadata, Record};
+use pcie::PcieCache;
 use serde::{Deserialize, Serialize};
 use std::env;
 use tower_http::cors::CorsLayer;
 use usb::UsbCache;
+
+/// Because the error that nom uses is rather lengthy and unintuitive, it's defined here
+/// to simplify handling
+pub type NomError<'a> = nom::Err<nom::error::Error<&'a str>>;
 /// https://docs.rs/log/latest/log/#implementing-a-logger
 struct SimpleLogger;
 
@@ -58,6 +63,7 @@ static LOGGER: SimpleLogger = SimpleLogger;
 struct AppState {
     pub cpu_cache: CpuCache,
     pub usb_cache: UsbCache,
+    pub pcie_cache: PcieCache,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -76,13 +82,45 @@ struct UsbResponse {
 async fn get_usb_handler(
     State(state): State<AppState>,
     Query(query): Query<UsbQuery>,
-) -> Json<UsbResponse> {
+) -> Result<Json<UsbResponse>, StatusCode> {
     // TODO: update docs
     let results = state.usb_cache.find(&query.identifier);
-    Json(UsbResponse {
-        vendor: results.0.map(|v| v.name),
-        device: results.1.map(|d| d.name),
-    })
+    match results {
+        Ok(r) => Ok(Json(UsbResponse {
+            vendor: r.0.map(|v| v.name),
+            device: r.1.map(|d| d.name),
+        })),
+        Err(_) => Err(StatusCode::NOT_FOUND),
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+struct PcieQuery {
+    identifier: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+struct PcieResponse {
+    pub vendor: Option<String>,
+    pub device: Option<String>,
+    pub subsystem: Option<String>,
+}
+
+/// This handler accepts a `GET` request to `/api/pcie/?identifier`.
+/// It relies on a globally shared [AppState] to re-use the pcie cache
+async fn get_pcie_handler(
+    State(state): State<AppState>,
+    Query(query): Query<PcieQuery>,
+) -> Result<Json<PcieResponse>, StatusCode> {
+    let results = state.pcie_cache.find(&query.identifier);
+    match results {
+        Ok(r) => Ok(Json(PcieResponse {
+            vendor: r.0.map(|v| v.name),
+            device: r.1.map(|d| d.name),
+            subsystem: r.2.map(|s| s.name),
+        })),
+        Err(_) => Err(StatusCode::NOT_FOUND),
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -113,10 +151,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let app = Router::new()
         .route("/api/cpus/", get(get_cpu_handler))
         .route("/api/usbs/", get(get_usb_handler))
+        .route("/api/pcie", get(get_pcie_handler))
         .layer(CorsLayer::new().allow_origin("*".parse::<HeaderValue>().unwrap()))
         .with_state(AppState {
             cpu_cache: CpuCache::new(),
             usb_cache: UsbCache::new(),
+            pcie_cache: PcieCache::new(),
         });
 
     let mut port: String = String::from("3000");

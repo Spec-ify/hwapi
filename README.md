@@ -48,17 +48,46 @@ curl "http://localhost:3000/api/cpus/?name=Intel%20Core%20i9-9900k"
 ```
 
 ### USB
-To interact with the USB API, submit a `GET` request to `/api/cpus/?name=[USB_IDENTIFIER_STRING]`, where `[USB_IDENTIFIER_STRING]` is a valid USB encoded string.
+To interact with the USB API, submit a `GET` request to `/api/usbs/?identifier=[USB_IDENTIFIER_STRING]`, where `[USB_IDENTIFIER_STRING]` is a valid [USB identifier](https://learn.microsoft.com/en-us/windows-hardware/drivers/install/identifiers-for-usb-devices).
 
 The endpoint will return a structure that looks like this:
 ```json
 {
-    "vendor": "string | null",
+    "vendor": "string",
     "device": "string | null",
 }
 ```
 
+Responses:<br>
+| Code | Meaning |
+| -- | -- |
+| `404` | No USB info was found with the given identifier |
+
+
 Here's an example curl request:
 ```
 curl "http://127.0.0.1:3000/api/usbs/?identifier=USB%5CVID_1532%26PID_0084%26MI_03%5C6%2638C0FA5D%260%260003"
+```
+
+### PCIe
+To interact with the PCIe API, submit a `GET` request to `/api/pcie/?identifier=[PCIE_IDENTIFIER_STRING]`, where `[PCIE_IDENTIFIER_STRING]` is a valid [PCIe identifier](https://learn.microsoft.com/en-us/windows-hardware/drivers/install/identifiers-for-pci-devices).
+
+The endpoint will return a structure that looks like this:
+```json
+{
+    "vendor": "string",
+    "device": "string | null",
+    "subsystem": "string | null"
+}
+```
+
+Responses:<br>
+| Code | Meaning |
+| -- | -- |
+| `404` | No PCIe info was found with the given identifier |
+
+
+Here's an example curl request:
+```
+curl "http://127.0.0.1:3000/api/pcie/?identifier=PCI%5CVEN_8086%26DEV_7A4D%26SUBSYS_00000000%26REV_11%5C3%2611583659%260%26A9%0A"
 ```

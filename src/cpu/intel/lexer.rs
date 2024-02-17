@@ -5,6 +5,8 @@ use nom::bytes::complete::{tag, take_until};
 use nom::sequence::{delimited, terminated};
 use nom::IResult;
 
+use crate::NomError;
+
 /// Everything deserialized by the lexer
 #[derive(Debug)]
 pub struct LexerOutput<'a> {
@@ -79,7 +81,7 @@ fn read_record(input: &str) -> IResult<&str, Vec<&str>> {
 fn read_section(input: &str) -> IResult<&str, &str> {
     // read a line and discard it, the actual "header", then read until there are two newlines in a row
     // this is nasty and could definitely be cleaned up a lot
-    let combinator_output: Result<(&str, &str), nom::Err<_>> = delimited(
+    let combinator_output: Result<(&str, &str), NomError> = delimited(
         // read a whole line, this is discarded
         terminated(take_until::<_, _, nom::error::Error<_>>("\n"), tag("\n")),
         // read until two newlines in a row
