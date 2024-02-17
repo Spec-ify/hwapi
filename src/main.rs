@@ -91,9 +91,9 @@ async fn get_usb_handler(
             device: r.1.map(|d| d.name),
         })),
         Err(e) => {
-            error!("usb error: {:?} caused by query: {:?}", e, query);
+            error!("usb handler error: {:?} caused by query: {:?}", e, query);
             Err(StatusCode::NOT_FOUND)
-        },
+        }
     }
 }
 
@@ -123,7 +123,7 @@ async fn get_pcie_handler(
             subsystem: r.2.map(|s| s.name),
         })),
         Err(e) => {
-            error!("pcie error: {:?} caused by query: {:?}", e, query);
+            error!("pcie handler error: {:?} caused by query: {:?}", e, query);
             Err(StatusCode::NOT_FOUND)
         }
     }
@@ -140,8 +140,14 @@ struct CpuQuery {
 async fn get_cpu_handler(
     State(mut state): State<AppState>,
     Query(query): Query<CpuQuery>,
-) -> Json<Cpu> {
-    Json(state.cpu_cache.find(&query.name))
+) -> Result<Json<Cpu>, StatusCode> {
+    match state.cpu_cache.find(&query.name) {
+        Ok(c) => Ok(Json(c)),
+        Err(e) => {
+            error!("cpu handler error {:?} caused by query {:?}", e, query);
+            Err(StatusCode::NOT_FOUND)
+        }
+    }
 }
 
 #[tokio::main]

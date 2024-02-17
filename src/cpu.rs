@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 
-use levenshtein::levenshtein;
-use log::{debug, trace};
+use log::{debug, error};
+use nom::bytes::complete::{take_until, take_while};
 use serde::Serialize;
 mod amd;
 mod intel;
@@ -18,14 +18,17 @@ pub struct Cpu {
     pub attributes: HashMap<String, String>,
 }
 
+#[derive(PartialEq, Clone)]
 struct IndexEntry {
     /// The primary identifier for a processor, like:
     /// - `14900` in `i9-14900k`
     model: String,
-    /// A list of modifiers applied directly to the processor number, like:
-    /// - `F` in `i5-11400F`
+    /// An identifier applied directly to the beginning of the processor number, like:
     /// - `i7-` in `i7-7600`
-    prefixes: String,
+    prefix: String,
+    /// Identifiers applied to the end of the processor number, like:
+    /// - `F` in `i5-11400F`
+    suffix: String,
     /// Similar to modifiers, but they're not directly a part of the processor, like:
     /// `PRO` in `Ryzen 5 PRO 5600`
     tags: HashSet<String>,
@@ -36,8 +39,9 @@ struct IndexEntry {
 #[derive(Clone)]
 pub struct CpuCache {
     intel_cpus: Vec<Cpu>,
+    intel_index: Vec<IndexEntry>,
     amd_cpus: Vec<Cpu>,
-    comparison_cache: HashMap<String, String>,
+    amd_index: Vec<IndexEntry>,
 }
 
 impl CpuCache {
@@ -45,13 +49,37 @@ impl CpuCache {
     pub fn new() -> Self {
         let intel_cpus = get_intel_cpus();
         debug!("Intel CPU list deserialized");
+        let mut intel_index: Vec<IndexEntry> = Vec::with_capacity(2048);
+        for (i, cpu) in intel_cpus.iter().enumerate() {
+            match generate_index_entry(&cpu.name, i) {
+                Ok(idx) => {
+                    intel_index.push(idx);
+                }
+                Err(e) => {
+                    error!("index will not be complete because generation generation failed for cpu: {:?} with error {:?}", cpu.name, e);
+                }
+            }
+        }
+        debug!("Index generated for Intel CPUs");
         let amd_cpus = get_amd_cpus();
         debug!("Amd CPU list deserialized");
+        let mut amd_index: Vec<IndexEntry> = Vec::with_capacity(2048);
+        for (i, cpu) in amd_cpus.iter().enumerate() {
+            match generate_index_entry(&cpu.name, i) {
+                Ok(idx) => {
+                    amd_index.push(idx);
+                }
+                Err(e) => {
+                    error!("index will not be complete because generation generation failed for cpu: {:?} with error {:?}", cpu.name, e);
+                }
+            }
+        }
 
         Self {
             intel_cpus,
+            intel_index,
             amd_cpus,
-            comparison_cache: HashMap::new(),
+            amd_index,
         }
     }
 
@@ -60,61 +88,98 @@ impl CpuCache {
     /// and return the entry with a `name` of "AMD Ryzen™ 5 3600".
     ///
     /// A mutable reference is required so that the comparison cache can be shared between calls
-    pub fn find(&mut self, input: &str) -> Cpu {
-        let input_model = find_model(input);
-        // a list of CPUs, and the most likely
+    pub fn find<'a>(&'a mut self, input: &'a str) -> Result<Cpu, Box<dyn std::error::Error + '_>> {
+        let index = if input.contains("AMD") {
+            &self.amd_index
+        } else {
+            &self.intel_index
+        };
+        let idx_for_input = generate_index_entry(input, 0)?;
+        // first look for an index entry that has an exact match for the processor model number
+        let similar_cpus = index.iter().filter(|idx| idx.model == idx_for_input.model);
+        // now find the closest fit among all similar cpus
+        // a higher score indicates a closer match
+        let mut best_score = -100;
+        let mut best_idx_match: Option<&IndexEntry> = None;
+        for idx_entry in similar_cpus {
+            let mut score: i32 = 0;
+            // if the prefix doesn't match, dock points
+            if idx_for_input.prefix != idx_entry.prefix {
+                score -= 10;
+            }
+            // if the suffix doesn't match, dock points
+            if idx_for_input.suffix != idx_entry.suffix {
+                score -= 10;
+            }
+            // for every matching tag that both entries have, give points
+            // points are not currently docked if the entry is missing tags that the input has
+            for tag in &idx_for_input.tags {
+                if idx_entry.tags.contains(tag) {
+                    score += 5;
+                }
+            }
+            // update the best fit if a better fit was found
+            if score > best_score {
+                best_score = score;
+                best_idx_match = Some(idx_entry);
+            }
+        }
         let cpus = if input.contains("AMD") {
             &self.amd_cpus
         } else {
             &self.intel_cpus
         };
-        // first see if a comparison has already been made
-        if let Some(cpu_name) = self.comparison_cache.get(input) {
-            return cpus
-                .into_iter()
-                .filter(|cpu| cpu.name == cpu_name.to_string())
-                .nth(0)
-                .unwrap()
-                .clone();
-        }
-        // performing a full search if the cpu isn't found in the cache
-        let mut best_fit = Cpu {
-            name: "FUBAR".to_string(),
-            attributes: HashMap::new(),
-        };
-        let mut best_score: usize = 10000;
-        trace!("input model: {}", input_model);
-        for cpu in cpus {
-            let model: String = find_model(&cpu.name).to_string();
-            // levenshtein distance is used to figure out how similar two strings are
-            // 0 means that they're identical, the higher the number, the less similar they are
-            let score = levenshtein(&input_model, &model);
-            if score < best_score {
-                best_score = score;
-                best_fit = cpu.clone();
-
-                trace!(
-                    "Best fit of {} found, with a score of {}",
-                    best_fit.name,
-                    best_score
-                );
+        match best_idx_match {
+            None => {
+                error!("When searching for cpu {:?}, no cpus were found with a matching model number of: {:?}", input, idx_for_input.model);
+                return Err(Box::from("No close matches found"));
+            }
+            Some(idx_entry) => {
+                return Ok(cpus[idx_entry.index].clone());
             }
         }
-        self.comparison_cache
-            .insert(input.to_string(), best_fit.name.clone());
-        debug!(
-            "Given the input: {:?}, the CPU {:?} was found",
-            input, best_fit.name
-        );
-        best_fit
     }
 }
 
-///
-fn generate_index_entry(name: &str) -> IndexEntry {
+/// Take the input model name, and try to parse it into an [IndexEntry] with an index of `index`.
+fn generate_index_entry<'name>(
+    name: &str,
+    index: usize,
+) -> Result<IndexEntry, Box<dyn std::error::Error + '_>> {
     let model_token = find_model(name);
+    // find the prefix, if one exists
+    let prefix_combinator: (&str, &str) =
+        match take_until::<_, _, nom::error::Error<_>>("-")(model_token.as_str()) {
+            Ok(p) => p,
+            Err(_) => {
+                // assume there's no prefix
+                ("", &model_token)
+            }
+        };
+    let model_combinator: (&str, &str) = match take_while::<_, _, nom::error::Error<_>>(
+        |c: char| c.is_ascii_digit(),
+    )(prefix_combinator.1)
+    {
+        Ok(m) => m,
+        Err(_) => {
+            return Err(Box::from(format!("index generation failed for cpu {:?} because no base 10 digits were found after the prefix", name)));
+        }
+    };
+    // tags are considered anything *but* the name, and a few keywords
+    let blacklist = ["Intel", "AMD", "Processor", name];
+    let mut tags: HashSet<String> = HashSet::new();
+    for tag in name.split(' ').filter(|t| !blacklist.contains(t)) {
+        tags.insert(tag.to_string());
+    }
 
-    todo!()
+    Ok(IndexEntry {
+        model: String::from(model_combinator.0),
+        prefix: String::from(prefix_combinator.0),
+        // just whatever is leftover after the combinator
+        suffix: String::from(model_combinator.1),
+        tags,
+        index,
+    })
 }
 
 /// Search the input string for the section that refers to the model of a CPU.
@@ -234,7 +299,7 @@ mod tests {
         ];
 
         for pairing in pairings {
-            let found_cpu = cache.find(pairing.1);
+            let found_cpu = cache.find(pairing.1).unwrap();
             assert_eq!(found_cpu.name, pairing.0, "With an input of {:?}, a database result of {:?} was expected, while {:?} was returned instead.", pairing.1, pairing.0, found_cpu.name);
         }
     }

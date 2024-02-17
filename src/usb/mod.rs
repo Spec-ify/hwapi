@@ -75,7 +75,10 @@ fn parse_device_identifier(device_string: &str) -> Result<(u16, u16), NomError> 
     // TODO: this does not fully support all formats of usb device identifiers
     let vid_combinator = delimited(tag("USB\\VID_"), take(4 as u8), take(1 as u8))(device_string)?;
     let pid_combinator = preceded(tag("PID_"), take(4 as u8))(vid_combinator.0)?;
-    Ok((u16::from_str_radix(vid_combinator.1, 16).unwrap(), u16::from_str_radix(pid_combinator.1, 16).unwrap()))
+    Ok((
+        u16::from_str_radix(vid_combinator.1, 16).unwrap(),
+        u16::from_str_radix(pid_combinator.1, 16).unwrap(),
+    ))
 }
 
 fn parse_usb_db() -> Vec<Vendor> {
@@ -107,7 +110,7 @@ fn read_header(input: &str) -> IResult<&str, &str> {
 /// This combinator reads a a vendor and all of the associated ids from the file
 fn read_vendor(input: &str) -> IResult<&str, Vendor> {
     // read the vendor id and vendor name
-    let vid_combinator_output = take(4 as u8)(input)?;
+    let vid_combinator_output = take(4_u8)(input)?;
     let vid = vid_combinator_output.1;
     let vname_combinator =
         delimited(tag("  "), take_until("\n"), char('\n'))(vid_combinator_output.0)?;
@@ -223,5 +226,4 @@ mod tests {
     fn basic_parse_usbs() {
         parse_usb_db();
     }
-
 }
