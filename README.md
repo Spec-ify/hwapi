@@ -28,10 +28,16 @@ The resulting executable will be located in `./target/release/`.
 ## Testing
 Testing also requires the rust toolchain installed.
 
-To test the project:
+To _test_ the project:
 ```
 cargo test
 ```
+
+To _profile_ the project, you'll need `cargo flamegraph` installed (`cargo install flamegraph`):
+```
+cargo flamegraph --root --unit-test -- [TEST_NAME]
+```
+Where `[TEST_NAME]` is the test you want to profile. There are other ways to profile different parts of the code, but you can figure that out yourself.
 
 ## Configuration
 By default, the application listens on port `3000`, although that can be configured by setting the `HWAPI_PORT` environment variable or by passing `-p`/`--port`.
