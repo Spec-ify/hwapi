@@ -172,9 +172,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         port = value;
     }
 
-    let cache = UsbCache::new();
-    println!("{:#?}", cache.find("USB\\VID_1532&PID_008A&MI_01\\7&238AA5C2&1&0001"));
-
     info!("Listening on port {}", port);
     // run the app
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port))
