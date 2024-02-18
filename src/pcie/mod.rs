@@ -3,6 +3,10 @@ use nom::bytes::complete::{tag, take, take_until};
 use nom::character::complete::char;
 use nom::sequence::{delimited, preceded, terminated};
 use nom::IResult;
+// https://stackoverflow.com/a/70552843
+// this library is used for a very fast hashmap implementation because we're not worried about DOS attacks
+use nohash_hasher::BuildNoHashHasher;
+use std::collections::HashMap;
 
 // the input file was obtained from https://pci-ids.ucw.cz/
 const FILE_INPUT: &str = include_str!("./pci.ids.txt");
@@ -12,7 +16,7 @@ const FILE_INPUT: &str = include_str!("./pci.ids.txt");
 pub struct Vendor {
     pub id: u16,
     pub name: String,
-    pub devices: Vec<Device>,
+    pub devices: HashMap<u16, Device, BuildNoHashHasher<u16>>,
 }
 
 /// Devices are placed directly under the relevant [Vendor] in the tree,
@@ -37,15 +41,18 @@ pub struct Subsystem {
 #[derive(Clone)]
 pub struct PcieCache {
     /// A list of vendors, where each vendor contains associated devices and subsystems
-    vendors: Vec<Vendor>,
+    vendors: HashMap<u16, Vendor, BuildNoHashHasher<u16>>,
 }
 
 impl PcieCache {
     /// create a new pcie cache and parse the database into memory
     pub fn new() -> Self {
-        Self {
-            vendors: parse_pcie_db().unwrap(),
+        let mut vendors: HashMap<u16, Vendor, BuildNoHashHasher<u16>> =
+            HashMap::with_capacity_and_hasher(2048, BuildNoHashHasher::default());
+        for vendor in parse_pcie_db().unwrap() {
+            vendors.insert(vendor.id, vendor);
         }
+        Self { vendors }
     }
 
     pub fn find<'a>(
@@ -54,21 +61,13 @@ impl PcieCache {
     ) -> Result<(Option<Vendor>, Option<Device>, Option<Subsystem>), NomError> {
         let parsed_identifier = parse_device_identifier(input)?;
         // search for a vendor
-        let vendor = self
-            .vendors
-            .iter()
-            .filter(|ven| ven.id == parsed_identifier.0)
-            .nth(0)
-            .cloned();
+        let vendor = self.vendors.get(&parsed_identifier.0);
 
-        let mut device: Option<Device> = None;
+        // if one were looking for even more performance, subsystem and device search should ideally also be done with a hashmap
+        let mut device: Option<&Device> = None;
         if let Some(ref ven) = vendor {
-            device = ven
-                .devices
-                .iter()
-                .filter(|dev| dev.id == parsed_identifier.1)
-                .nth(0)
-                .cloned();
+            // a lot of these memory allocations are entirely necessary, just return a reference and figure out lifetimes
+            device = ven.devices.get(&parsed_identifier.1);
         }
 
         let mut subsystem: Option<Subsystem> = None;
@@ -80,7 +79,7 @@ impl PcieCache {
                 .nth(0)
                 .cloned();
         }
-        Ok((vendor, device, subsystem))
+        Ok((vendor.cloned(), device.cloned(), subsystem))
     }
 }
 
@@ -138,13 +137,14 @@ fn read_vendor(input: &str) -> IResult<&str, Vendor> {
     let vname_combinator = terminated(take_until("\n"), char('\n'))(vid_combinator.0)?;
     let vname = vname_combinator.1;
     // read until the next line doesn't start with a tab
-    let mut devices: Vec<Device> = Vec::new();
+    let mut devices: HashMap<u16, Device, BuildNoHashHasher<u16>> =
+        HashMap::with_hasher(BuildNoHashHasher::default());
     let mut iterated_output = read_device(vname_combinator.0);
     let mut leftover = vname_combinator.0;
     loop {
         if let Ok(combinator_output) = iterated_output {
             leftover = combinator_output.0;
-            devices.push(combinator_output.1);
+            devices.insert(combinator_output.1.id, combinator_output.1);
             iterated_output = read_device(combinator_output.0);
         } else {
             // Some lines have comments, handle those here, this is assuming the next line is indented
@@ -226,6 +226,10 @@ fn read_subsystem_line(input: &str) -> IResult<&str, Subsystem> {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
+
+    use nohash_hasher::BuildNoHashHasher;
+
     use crate::pcie::{
         parse_device_identifier, read_device, read_subsystem_line, read_vendor, Device, Subsystem,
         Vendor,
@@ -308,6 +312,16 @@ mod tests {
     #[test]
     fn basic_read_vendor() {
         let mock_vendor = "0001  foo\n\t000a  bar\n0002";
+        let mut mock_devices: HashMap<u16, Device, nohash_hasher::BuildNoHashHasher<u16>> =
+            HashMap::with_hasher(BuildNoHashHasher::default());
+        mock_devices.insert(
+            0x00a,
+            Device {
+                id: 0x000a,
+                name: String::from("bar"),
+                subsystems: vec![],
+            },
+        );
         assert_eq!(
             read_vendor(mock_vendor),
             Ok((
@@ -315,11 +329,7 @@ mod tests {
                 Vendor {
                     id: 0x0001,
                     name: String::from("foo"),
-                    devices: vec![Device {
-                        id: 0x000a,
-                        name: String::from("bar"),
-                        subsystems: vec![]
-                    }]
+                    devices: mock_devices
                 }
             ))
         )
