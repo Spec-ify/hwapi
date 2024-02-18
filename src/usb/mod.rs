@@ -1,8 +1,12 @@
+use std::collections::HashMap;
+
 use nom::bytes::complete::{tag, take, take_until};
 use nom::character::complete::char;
 use nom::sequence::{delimited, preceded};
 use nom::IResult;
-
+// https://stackoverflow.com/a/70552843
+// this library is used for a very fast hashmap implementation because we're not worried about DOS attacks
+use nohash_hasher::BuildNoHashHasher;
 use crate::NomError;
 
 // The input file was obtained from http://www.linux-usb.org/
@@ -25,13 +29,17 @@ pub struct Device {
 
 #[derive(Clone)]
 pub struct UsbCache {
-    vendors: Vec<Vendor>,
+    vendors: HashMap<u16, Vendor, BuildNoHashHasher<u16>>,
 }
 
 impl UsbCache {
     pub fn new() -> Self {
+        let mut vendors: HashMap<u16, Vendor, BuildNoHashHasher<u16>> = HashMap::with_capacity_and_hasher(1024, BuildNoHashHasher::default());
+        for vendor in parse_usb_db() {
+            vendors.insert(vendor.id, vendor);
+        }
         Self {
-            vendors: parse_usb_db(),
+            vendors,
         }
     }
 
@@ -47,18 +55,14 @@ impl UsbCache {
         let parsed_identifier = parse_device_identifier(input)?;
         // first search for a vendor
         let matching_vendor = self
-            .vendors
-            .iter()
-            .filter(|ven| ven.id == parsed_identifier.0)
-            .nth(0);
+            .vendors.get(&parsed_identifier.0);
 
         let mut device: Option<Device> = None;
         if let Some(vendor) = matching_vendor {
             device = vendor
                 .devices
                 .iter()
-                .filter(|dev| dev.id == parsed_identifier.1)
-                .nth(0)
+                .find(|dev| dev.id == parsed_identifier.1)
                 .cloned();
         }
 

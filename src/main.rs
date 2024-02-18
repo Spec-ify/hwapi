@@ -140,15 +140,36 @@ async fn post_pcie_handler(
     let mut response: Vec<Option<PcieResponse>> = Vec::with_capacity(16);
     for entry in query {
         match state.pcie_cache.find(&entry) {
-            Ok(r) => {
-                response.push(Some(PcieResponse {
-                    vendor: r.0.map(|v| v.name),
-                    device: r.1.map(|d| d.name),
-                    subsystem: r.2.map(|s| s.name),
-                }))
-            },
+            Ok(r) => response.push(Some(PcieResponse {
+                vendor: r.0.map(|v| v.name),
+                device: r.1.map(|d| d.name),
+                subsystem: r.2.map(|s| s.name),
+            })),
             Err(e) => {
                 warn!("post pcie handler error: when processing the device identifier {:?}, an error was returned: {:?}", entry, e);
+                response.push(None);
+            }
+        }
+    }
+    Ok(Json(response))
+}
+
+/// This handler accepts a `POST` request to `/api/usbs/`, with a body containing a serialized array of usb device identifier strings.
+/// It relies on a globally shared [AppState] to re-use the pcie cache, and is largely identical to [get_usb_handler], but
+/// is intended for batching
+async fn post_usbs_handler(
+    State(state): State<AppState>,
+    Json(query): Json<Vec<String>>,
+) -> Result<Json<Vec<Option<UsbResponse>>>, StatusCode> {
+    let mut response: Vec<Option<UsbResponse>> = Vec::with_capacity(16);
+    for entry in query {
+        match state.usb_cache.find(&entry) {
+            Ok(r) => response.push(Some(UsbResponse {
+                vendor: r.0.map(|v| v.name),
+                device: r.1.map(|d| d.name),
+            })),
+            Err(e) => {
+                warn!("post usb handler error: when processing the device identifier {:?}, an error was returned: {:?}", entry, e);
                 response.push(None);
             }
         }
@@ -190,6 +211,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let app = Router::new()
         .route("/api/cpus/", get(get_cpu_handler))
         .route("/api/usbs/", get(get_usb_handler))
+        .route("/api/usbs/", post(post_usbs_handler))
         .route("/api/pcie/", get(get_pcie_handler))
         .route("/api/pcie/", post(post_pcie_handler))
         .layer(CorsLayer::new().allow_origin("*".parse::<HeaderValue>().unwrap()))

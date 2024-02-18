@@ -75,6 +75,32 @@ Here's an example curl request:
 curl "http://127.0.0.1:3000/api/usbs/?identifier=USB%5CVID_1532%26PID_0084%26MI_03%5C6%2638C0FA5D%260%260003"
 ```
 
+For bulk processing, you may submit a `POST` request to the same endpoint with a `Content-Type` of `application/json` and a payload containing an array of USB device identifier strings.
+
+The endpoint will return an array of objects (same shape as the `GET` request), or if an identifier string was unable to be processed successfully, `null` will substitute in the response.
+
+Here's an example curl request:
+```
+curl -X POST http://127.0.0.1:3000/api/usbs/ -H "Content-Type: application/json" -d '["USB\\\\VID_1038&PID_1729\\\\6&28B2
+9415&0&4","USB\\\\VID_413C&PID_2105\\\\6&3B66B33D&0&9","USB\\\\ROOT_HUB30\\\\5&381F2DE&0&0","USB\\\\VID_1038&PID_1729&MI_00\\\\7&381E8103&0&0000","USB\\\\VID_0B05&PID_184C\\\\123456","US
+B\\\\VID_1038&PID_1729&MI_01\\\\7&381E8103&0&0001","USB\\\\ROOT_HUB30\\\\5&3B7A03C3&0&0"]'
+```
+
+And here's an example response (truncated):
+```json
+[
+   {
+      "vendor":"SteelSeries ApS",
+      "device":null
+   },
+   {
+      "vendor":"Dell Computer Corp.",
+      "device":"Model L100 Keyboard"
+   },
+   null
+]
+```
+
 ### PCIe
 To interact with the PCIe API, submit a `GET` request to `/api/pcie/?identifier=[PCIE_IDENTIFIER_STRING]`, where `[PCIE_IDENTIFIER_STRING]` is a valid [PCIe identifier](https://learn.microsoft.com/en-us/windows-hardware/drivers/install/identifiers-for-pci-devices).
 
@@ -109,7 +135,8 @@ curl -X POST http://127.0.0.1:3000/api/pcie/ -H "Content-Type: application/json"
 VEN_1022&DEV_43B4&SUBSYS_33061B21&REV_02\\\\5&3B34128B&0&28020B","PCI\\\\VEN_1022&DEV_1441&SUBSYS_00000000&REV_00\\\\3&11583659&0&C1","PCI\\\\VEN_1022&DEV_43B4&SUBSYS_33061B21&REV_02\\\\
 5&3B34128B&0&38020B"]'
 ```
-And here's example response (cropped):
+
+And here's example response (truncated):
 ```
 [
    {

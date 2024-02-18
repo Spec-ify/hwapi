@@ -75,8 +75,7 @@ impl PcieCache {
             subsystem = dev
                 .subsystems
                 .iter()
-                .filter(|s| s.id == parsed_identifier.1)
-                .nth(0)
+                .find(|s| s.id == parsed_identifier.1)
                 .cloned();
         }
         Ok((vendor.cloned(), device.cloned(), subsystem))
