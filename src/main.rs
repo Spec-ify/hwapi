@@ -4,12 +4,13 @@ mod usb;
 
 use axum::extract::Query;
 use axum::http::{HeaderValue, StatusCode};
+use axum::routing::post;
 use axum::{extract::State, routing::get, Json, Router};
 use chrono::Local;
 use clap::Parser;
 use colored::*;
 use cpu::{Cpu, CpuCache};
-use log::{error, info};
+use log::{error, info, warn};
 use log::{Level, LevelFilter, Metadata, Record};
 use pcie::PcieCache;
 use serde::{Deserialize, Serialize};
@@ -98,7 +99,7 @@ async fn get_usb_handler(
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-struct PcieQuery {
+struct GetPcieQuery {
     identifier: String,
 }
 
@@ -113,7 +114,7 @@ struct PcieResponse {
 /// It relies on a globally shared [AppState] to re-use the pcie cache
 async fn get_pcie_handler(
     State(state): State<AppState>,
-    Query(query): Query<PcieQuery>,
+    Query(query): Query<GetPcieQuery>,
 ) -> Result<Json<PcieResponse>, StatusCode> {
     let results = state.pcie_cache.find(&query.identifier);
     match results {
@@ -127,6 +128,32 @@ async fn get_pcie_handler(
             Err(StatusCode::NOT_FOUND)
         }
     }
+}
+
+/// This handler accepts a `POST` request to `/api/pcie/`, with a body containing a serialized array of strings.
+/// It relies on a globally shared [AppState] to re-use the pcie cache, and is largely identical to [get_pcie_handler], but
+/// is intended for batching
+async fn post_pcie_handler(
+    State(state): State<AppState>,
+    Json(query): Json<Vec<String>>,
+) -> Result<Json<Vec<Option<PcieResponse>>>, StatusCode> {
+    let mut response: Vec<Option<PcieResponse>> = Vec::with_capacity(16);
+    for entry in query {
+        match state.pcie_cache.find(&entry) {
+            Ok(r) => {
+                response.push(Some(PcieResponse {
+                    vendor: r.0.map(|v| v.name),
+                    device: r.1.map(|d| d.name),
+                    subsystem: r.2.map(|s| s.name),
+                }))
+            },
+            Err(e) => {
+                warn!("post pcie handler error: when processing the device identifier {:?}, an error was returned: {:?}", entry, e);
+                response.push(None);
+            }
+        }
+    }
+    Ok(Json(response))
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -164,6 +191,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/api/cpus/", get(get_cpu_handler))
         .route("/api/usbs/", get(get_usb_handler))
         .route("/api/pcie/", get(get_pcie_handler))
+        .route("/api/pcie/", post(post_pcie_handler))
         .layer(CorsLayer::new().allow_origin("*".parse::<HeaderValue>().unwrap()))
         .with_state(AppState {
             cpu_cache: CpuCache::new(),

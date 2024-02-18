@@ -97,3 +97,30 @@ Here's an example curl request:
 ```
 curl "http://127.0.0.1:3000/api/pcie/?identifier=PCI%5CVEN_8086%26DEV_7A4D%26SUBSYS_00000000%26REV_11%5C3%2611583659%260%26A9%0A"
 ```
+
+For bulk processing, you may submit a `POST` request to the same endpoint with a `Content-Type` of `application/json` and a payload containing an array of PCIe device identifier strings.
+
+The endpoint will return an array of objects (same shape as the `GET` request), or if an identifier string was unable to be processed successfully, `null` will substitute in the response.
+
+Here's an example curl request:
+```
+curl -X POST http://127.0.0.1:3000/api/pcie/ -H "Content-Type: application/json" -d '["PCI\\\\VEN_1022&DEV_43B4&SUBSYS_33
+061B21&REV_02\\\\5&3B34128B&0&30020B","PCI\\\\VEN_1022&DEV_1444&SUBSYS_00000000&REV_00\\\\3&11583659&0&C4","PCI\\\\VEN_1022&DEV_43BC&SUBSYS_11421B21&REV_02\\\\4&2C18E2E3&0&000B","PCI\\\\
+VEN_1022&DEV_43B4&SUBSYS_33061B21&REV_02\\\\5&3B34128B&0&28020B","PCI\\\\VEN_1022&DEV_1441&SUBSYS_00000000&REV_00\\\\3&11583659&0&C1","PCI\\\\VEN_1022&DEV_43B4&SUBSYS_33061B21&REV_02\\\\
+5&3B34128B&0&38020B"]'
+```
+And here's example response (cropped):
+```
+[
+   {
+      "vendor":"Advanced Micro Devices, Inc. [AMD]",
+      "device":"300 Series Chipset PCIe Port",
+      "subsystem":null
+   },
+   {
+      "vendor":"Advanced Micro Devices, Inc. [AMD]",
+      "device":"Matisse/Vermeer Data Fabric: Device 18h; Function 4",
+      "subsystem":null
+   },
+]
+```
