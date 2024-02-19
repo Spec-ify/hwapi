@@ -6,8 +6,8 @@ use nom::sequence::{delimited, preceded};
 use nom::IResult;
 // https://stackoverflow.com/a/70552843
 // this library is used for a very fast hashmap implementation because we're not worried about DOS attacks
-use nohash_hasher::BuildNoHashHasher;
 use crate::NomError;
+use nohash_hasher::BuildNoHashHasher;
 
 // The input file was obtained from http://www.linux-usb.org/
 // note: only vendors and devices are currently read from the file, there's extra crap at the bottom that might be useful
@@ -34,13 +34,12 @@ pub struct UsbCache {
 
 impl UsbCache {
     pub fn new() -> Self {
-        let mut vendors: HashMap<u16, Vendor, BuildNoHashHasher<u16>> = HashMap::with_capacity_and_hasher(1024, BuildNoHashHasher::default());
+        let mut vendors: HashMap<u16, Vendor, BuildNoHashHasher<u16>> =
+            HashMap::with_capacity_and_hasher(1024, BuildNoHashHasher::default());
         for vendor in parse_usb_db() {
             vendors.insert(vendor.id, vendor);
         }
-        Self {
-            vendors,
-        }
+        Self { vendors }
     }
 
     /// Search the cache for the provided input string, returning the found device info, if it exists. If the `Option<Vendor>` is `None`,
@@ -54,8 +53,7 @@ impl UsbCache {
     ) -> Result<(Option<Vendor>, Option<Device>), NomError<'a>> {
         let parsed_identifier = parse_device_identifier(input)?;
         // first search for a vendor
-        let matching_vendor = self
-            .vendors.get(&parsed_identifier.0);
+        let matching_vendor = self.vendors.get(&parsed_identifier.0);
 
         let mut device: Option<Device> = None;
         if let Some(vendor) = matching_vendor {

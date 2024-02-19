@@ -9,13 +9,16 @@ mod intel;
 use amd::get_amd_cpus;
 use intel::get_intel_cpus;
 
-/// A generic representation of a cpu
+/// A generic representation of a cpu. T is the string type, there are massive gains by using zero copy for the intel cpu database, but that's a lot more work
+/// for the amd CPU database.
+///
+/// I know it's awful, leave me alone. -Arc
 #[derive(Clone, Debug, Serialize)]
-pub struct Cpu {
+pub struct Cpu<T> {
     /// Something like "Intel core i5-1234 processor"
-    pub name: String,
+    pub name: T,
     /// A list of attributes, examples might include a core count of 8, or whether or not a certain feature is enabled
-    pub attributes: HashMap<String, String>,
+    pub attributes: HashMap<T, T>,
 }
 
 #[derive(PartialEq, Clone)]
@@ -37,14 +40,14 @@ struct IndexEntry {
 }
 
 #[derive(Clone)]
-pub struct CpuCache {
-    intel_cpus: Vec<Cpu>,
+pub struct CpuCache<'a> {
+    intel_cpus: Vec<Cpu<&'a str>>,
     intel_index: Vec<IndexEntry>,
-    amd_cpus: Vec<Cpu>,
+    amd_cpus: Vec<Cpu<String>>,
     amd_index: Vec<IndexEntry>,
 }
 
-impl CpuCache {
+impl CpuCache<'_> {
     /// Create a new cache and parse the cpu databases into memory
     pub fn new() -> Self {
         let intel_cpus = get_intel_cpus();
@@ -88,7 +91,10 @@ impl CpuCache {
     /// and return the entry with a `name` of "AMD Ryzen™ 5 3600".
     ///
     /// A mutable reference is required so that the comparison cache can be shared between calls
-    pub fn find<'a>(&'a mut self, input: &'a str) -> Result<Cpu, Box<dyn std::error::Error + '_>> {
+    pub fn find<'a>(
+        &'a mut self,
+        input: &'a str,
+    ) -> Result<Cpu<String>, Box<dyn std::error::Error + '_>> {
         let index = if input.contains("AMD") {
             &self.amd_index
         } else {
@@ -124,18 +130,30 @@ impl CpuCache {
                 best_idx_match = Some(idx_entry);
             }
         }
-        let cpus = if input.contains("AMD") {
-            &self.amd_cpus
-        } else {
-            &self.intel_cpus
-        };
+        // let cpus: &Vec<Cpu<_>> = if input.contains("AMD") {
+        //     &self.amd_cpus
+        // } else {
+        //     &self.intel_cpus
+        // };
         match best_idx_match {
             None => {
                 error!("When searching for cpu {:?}, no cpus were found with a matching model number of: {:?}", input, idx_for_input.model);
                 return Err(Box::from("No close matches found"));
             }
             Some(idx_entry) => {
-                return Ok(cpus[idx_entry.index].clone());
+                if input.contains("AMD") {
+                    return Ok(self.amd_cpus[idx_entry.index].clone());
+                }
+                // intel requires some work to un-zerocopy data
+                let found_cpu = &self.intel_cpus[idx_entry.index];
+                return Ok(Cpu {
+                    name: found_cpu.name.to_string(),
+                    attributes: found_cpu
+                        .attributes
+                        .iter()
+                        .map(|(k, v)| (k.to_string(), v.to_string()))
+                        .collect(),
+                });
             }
         }
     }

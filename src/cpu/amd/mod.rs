@@ -12,7 +12,7 @@ struct AmdJson {
     data: Vec<HashMap<String, serde_json::Value>>,
 }
 
-pub fn get_amd_cpus() -> Vec<Cpu> {
+pub fn get_amd_cpus<'a>() -> Vec<Cpu<String>> {
     let deserialized_json = deserialize_json();
     process_json(deserialized_json)
 }
@@ -23,8 +23,8 @@ fn deserialize_json() -> AmdJson {
 }
 
 /// Take a struct directly from the json and format it into a vec of [Cpu]
-fn process_json(json: AmdJson) -> Vec<Cpu> {
-    let mut output: Vec<Cpu> = Vec::with_capacity(json.data.len());
+fn process_json<'a>(json: AmdJson) -> Vec<Cpu<String>> {
+    let mut output: Vec<Cpu<String>> = Vec::with_capacity(json.data.len());
     for raw_data in json.data {
         // first strip out some stray keys that appear to be cruft
         // fun fact, some of the models are not a string, but a *number*
@@ -65,7 +65,7 @@ fn process_json(json: AmdJson) -> Vec<Cpu> {
                     output_cpu.attributes.insert(key.to_string(), n.to_string());
                 }
                 _ => {
-                    panic!("Unexpected type found in json");
+                    panic!("Unexpected type found in amd json");
                 }
             }
             // output_cpu

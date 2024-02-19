@@ -61,8 +61,8 @@ struct Args {
 static LOGGER: SimpleLogger = SimpleLogger;
 
 #[derive(Clone)]
-struct AppState {
-    pub cpu_cache: CpuCache,
+struct AppState<'a> {
+    pub cpu_cache: CpuCache<'a>,
     pub usb_cache: UsbCache,
     pub pcie_cache: PcieCache,
 }
@@ -80,8 +80,8 @@ struct UsbResponse {
 
 /// This handler accepts a `GET` request to `/api/usbs/?identifier`.
 /// It relies on a globally shared [AppState] to re-use the usb cache.
-async fn get_usb_handler(
-    State(state): State<AppState>,
+async fn get_usb_handler<'a>(
+    State(state): State<AppState<'a>>,
     Query(query): Query<UsbQuery>,
 ) -> Result<Json<UsbResponse>, StatusCode> {
     // TODO: update docs
@@ -113,7 +113,7 @@ struct PcieResponse {
 /// This handler accepts a `GET` request to `/api/pcie/?identifier`.
 /// It relies on a globally shared [AppState] to re-use the pcie cache
 async fn get_pcie_handler(
-    State(state): State<AppState>,
+    State(state): State<AppState<'_>>,
     Query(query): Query<GetPcieQuery>,
 ) -> Result<Json<PcieResponse>, StatusCode> {
     let results = state.pcie_cache.find(&query.identifier);
@@ -134,7 +134,7 @@ async fn get_pcie_handler(
 /// It relies on a globally shared [AppState] to re-use the pcie cache, and is largely identical to [get_pcie_handler], but
 /// is intended for batching
 async fn post_pcie_handler(
-    State(state): State<AppState>,
+    State(state): State<AppState<'_>>,
     Json(query): Json<Vec<String>>,
 ) -> Result<Json<Vec<Option<PcieResponse>>>, StatusCode> {
     let mut response: Vec<Option<PcieResponse>> = Vec::with_capacity(16);
@@ -158,7 +158,7 @@ async fn post_pcie_handler(
 /// It relies on a globally shared [AppState] to re-use the pcie cache, and is largely identical to [get_usb_handler], but
 /// is intended for batching
 async fn post_usbs_handler(
-    State(state): State<AppState>,
+    State(state): State<AppState<'_>>,
     Json(query): Json<Vec<String>>,
 ) -> Result<Json<Vec<Option<UsbResponse>>>, StatusCode> {
     let mut response: Vec<Option<UsbResponse>> = Vec::with_capacity(16);
@@ -185,12 +185,19 @@ struct CpuQuery {
 /// This handler accepts a `GET` request to `/api/cpus/?name=[CPU_NAME]`.
 /// It relies on a globally shared [AppState] to re-use the cpu cache, and responds to the request with a serialized [Cpu].
 /// It will always attempt to find a cpu, and should always return a cpu. The correctness of the return value is not guaranteed.
-async fn get_cpu_handler(
-    State(mut state): State<AppState>,
+async fn get_cpu_handler<'a>(
+    State(mut state): State<AppState<'a>>,
     Query(query): Query<CpuQuery>,
-) -> Result<Json<Cpu>, StatusCode> {
+) -> Result<Json<Cpu<String>>, StatusCode> {
     match state.cpu_cache.find(&query.name) {
-        Ok(c) => Ok(Json(c)),
+        Ok(c) => Ok(Json(Cpu {
+            name: c.name.to_string(),
+            attributes: c
+                .attributes
+                .iter()
+                .map(|(k, v)| (k.to_string(), v.to_string()))
+                .collect(),
+        })),
         Err(e) => {
             error!("cpu handler error {:?} caused by query {:?}", e, query);
             Err(StatusCode::NOT_FOUND)

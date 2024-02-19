@@ -62,8 +62,8 @@ const CHUNKS: [&str; 15] = [
     include_str!("chunks/15.csv"),
 ];
 
-pub fn get_intel_cpus() -> Vec<Cpu> {
-    let mut merged_vec: Vec<Cpu> = Vec::with_capacity(1024);
+pub fn get_intel_cpus() -> Vec<Cpu<&'static str>> {
+    let mut merged_vec: Vec<Cpu<&str>> = Vec::with_capacity(1024);
     for chunk in CHUNKS {
         merged_vec.append(&mut parse_csv(chunk).unwrap());
     }
