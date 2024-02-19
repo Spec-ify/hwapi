@@ -50,9 +50,9 @@ pub struct CpuCache<'a> {
 impl CpuCache<'_> {
     /// Create a new cache and parse the cpu databases into memory
     pub fn new() -> Self {
-        let intel_cpus = get_intel_cpus();
+        let mut intel_cpus = get_intel_cpus();
         debug!("Intel CPU list deserialized");
-        let mut intel_index: Vec<IndexEntry> = Vec::with_capacity(2048);
+        let mut intel_index: Vec<IndexEntry> = Vec::with_capacity(512);
         for (i, cpu) in intel_cpus.iter().enumerate() {
             match generate_index_entry(&cpu.name, i) {
                 Ok(idx) => {
@@ -64,7 +64,7 @@ impl CpuCache<'_> {
             }
         }
         debug!("Index generated for Intel CPUs");
-        let amd_cpus = get_amd_cpus();
+        let mut amd_cpus = get_amd_cpus();
         debug!("Amd CPU list deserialized");
         let mut amd_index: Vec<IndexEntry> = Vec::with_capacity(2048);
         for (i, cpu) in amd_cpus.iter().enumerate() {
@@ -77,6 +77,12 @@ impl CpuCache<'_> {
                 }
             }
         }
+        // because of the way memory allocations for vectors are done, over time, a lot of empty elements can get pre-allocated.
+        // remove those now
+        intel_cpus.shrink_to_fit();
+        amd_cpus.shrink_to_fit();
+        intel_index.shrink_to_fit();
+        amd_index.shrink_to_fit();
 
         Self {
             intel_cpus,

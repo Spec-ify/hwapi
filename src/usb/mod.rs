@@ -39,6 +39,7 @@ impl UsbCache {
         for vendor in parse_usb_db() {
             vendors.insert(vendor.id, vendor);
         }
+        vendors.shrink_to_fit();
         Self { vendors }
     }
 

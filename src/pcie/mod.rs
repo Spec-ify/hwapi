@@ -48,10 +48,12 @@ impl PcieCache {
     /// create a new pcie cache and parse the database into memory
     pub fn new() -> Self {
         let mut vendors: HashMap<u16, Vendor, BuildNoHashHasher<u16>> =
-            HashMap::with_capacity_and_hasher(2048, BuildNoHashHasher::default());
+            HashMap::with_capacity_and_hasher(512, BuildNoHashHasher::default());
         for vendor in parse_pcie_db().unwrap() {
             vendors.insert(vendor.id, vendor);
         }
+        // cut down on those unnecessary allocations again (1gb vps life)
+        vendors.shrink_to_fit();
         Self { vendors }
     }
 

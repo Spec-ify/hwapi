@@ -38,7 +38,7 @@ fn process_json<'a>(json: AmdJson) -> Vec<Cpu<String>> {
         };
         let mut output_cpu = Cpu {
             name,
-            attributes: HashMap::with_capacity(75),
+            attributes: HashMap::new(),
         };
         for key in raw_data.keys() {
             // stripping out keys that are either garbage, or already handled (model)

@@ -6,11 +6,11 @@ use std::error::Error;
 pub fn parse_csv(csv: &'_ str) -> Result<Vec<Cpu<&str>>, Box<dyn Error + '_>> {
     let lexer_output = lex_csv(csv)?;
     // the returned value
-    let mut output: Vec<Cpu<&str>> = Vec::with_capacity(lexer_output.cpus.len());
+    let mut output: Vec<Cpu<&str>> = Vec::new();
     for (i, cpu_name) in lexer_output.cpus.iter().enumerate() {
         let mut cpu: Cpu<&str> = Cpu {
             name: cpu_name,
-            attributes: HashMap::with_capacity(256),
+            attributes: HashMap::new(),
         };
         for record in lexer_output.records.clone() {
             // println!("{:#?}", record[0].to_string());
