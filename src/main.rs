@@ -17,6 +17,7 @@ use serde::{Deserialize, Serialize};
 use std::env;
 use tower_http::cors::CorsLayer;
 use usb::UsbCache;
+use http::{Method,header};
 
 /// Because the error that nom uses is rather lengthy and unintuitive, it's defined here
 /// to simplify handling
@@ -221,7 +222,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/api/usbs/", post(post_usbs_handler))
         .route("/api/pcie/", get(get_pcie_handler))
         .route("/api/pcie/", post(post_pcie_handler))
-        .layer(CorsLayer::new().allow_origin("*".parse::<HeaderValue>().unwrap()))
+        .layer(CorsLayer::new().allow_methods([Method::GET, Method::POST]).allow_headers([header::ACCEPT, header::CONTENT_TYPE]).allow_origin("*".parse::<HeaderValue>().unwrap()))
         .with_state(AppState {
             cpu_cache: CpuCache::new(),
             usb_cache: UsbCache::new(),

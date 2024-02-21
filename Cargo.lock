@@ -439,6 +439,7 @@ dependencies = [
  "chrono",
  "clap",
  "colored",
+ "http",
  "levenshtein",
  "log",
  "nohash-hasher",
