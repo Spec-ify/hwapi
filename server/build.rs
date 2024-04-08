@@ -19,7 +19,7 @@ fn main() {
 /// Parse the database for AMD cpus and generate `src/cpu/amd_codegen.rs`
 fn gen_amd_cpus() {
     let destination = Path::new("src/cpu/").join("amd_codegen.rs");
-    let mut generated_file = BufWriter::new(File::create(&destination).unwrap());
+    let mut generated_file = BufWriter::new(File::create(destination).unwrap());
     let mut generated_map = phf_codegen::Map::new();
     // there are a few duplicate entries, so this is quick and dirty way to do duplicate detection
     let mut entries: HashSet<String> = HashSet::new();
@@ -40,13 +40,13 @@ fn gen_amd_cpus() {
         generated_map.build()
     )
     .unwrap();
-    write!(&mut generated_file, ";\n").unwrap();
+    writeln!(&mut generated_file, ";").unwrap();
 }
 
 /// Parse the database for intel cpus and generate `src/cpu/intel_codegen.rs`
 fn gen_intel_cpus() {
     let destination = Path::new("src/cpu/").join("intel_codegen.rs");
-    let mut generated_file = BufWriter::new(File::create(&destination).unwrap());
+    let mut generated_file = BufWriter::new(File::create(destination).unwrap());
     let mut generated_map = phf_codegen::Map::new();
     // there are a few duplicate entries, so this is quick and dirty way to do duplicate detection
     let mut entries: HashSet<String> = HashSet::new();
@@ -67,5 +67,5 @@ fn gen_intel_cpus() {
         generated_map.build()
     )
     .unwrap();
-    write!(&mut generated_file, ";\n").unwrap();
+    writeln!(&mut generated_file, ";").unwrap();
 }

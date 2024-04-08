@@ -8,6 +8,8 @@ use nom::IResult;
 use nohash_hasher::BuildNoHashHasher;
 use std::collections::HashMap;
 
+pub type PcieDeviceInfo = (Option<Vendor>, Option<Device>, Option<Subsystem>);
+
 // the input file was obtained from https://pci-ids.ucw.cz/
 const FILE_INPUT: &str = include_str!("./pci.ids.txt");
 
@@ -60,20 +62,20 @@ impl PcieCache {
     pub fn find<'a>(
         &'a self,
         input: &'a str,
-    ) -> Result<(Option<Vendor>, Option<Device>, Option<Subsystem>), NomError> {
+    ) -> Result<PcieDeviceInfo, NomError> {
         let parsed_identifier = parse_device_identifier(input)?;
         // search for a vendor
         let vendor = self.vendors.get(&parsed_identifier.0);
 
         // if one were looking for even more performance, subsystem and device search should ideally also be done with a hashmap
         let mut device: Option<&Device> = None;
-        if let Some(ref ven) = vendor {
+        if let Some(ven) = vendor {
             // a lot of these memory allocations are entirely necessary, just return a reference and figure out lifetimes
             device = ven.devices.get(&parsed_identifier.1);
         }
 
         let mut subsystem: Option<Subsystem> = None;
-        if let Some(ref dev) = device {
+        if let Some(dev) = device {
             subsystem = dev
                 .subsystems
                 .iter()
@@ -84,20 +86,26 @@ impl PcieCache {
     }
 }
 
+impl Default for PcieCache {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// This function searches the input string for a vendor id, a product id, and optionally a subsystem ID
 /// input strings are expected in the format of:
 ///
 /// `PCI\VEN_10EC&DEV_8168&SUBSYS_86771043&REV_15\6&102E3ADF&0&0048020A`
 ///
 /// Output is returned as a tuple of (`vendor`, `device`, `subsystem`)
-fn parse_device_identifier<'a>(input: &'a str) -> Result<(u16, u16, Option<u16>), NomError<'a>> {
+fn parse_device_identifier(input: &str) -> Result<(u16, u16, Option<u16>), NomError<'_>> {
     // TODO: validate that ids are hex strings
-    let vid_combinator = delimited(tag("PCI\\VEN_"), take(4 as u8), char('&'))(input)?;
+    let vid_combinator = delimited(tag("PCI\\VEN_"), take(4_u8), char('&'))(input)?;
     // https://learn.microsoft.com/en-us/windows-hardware/drivers/install/identifiers-for-pci-devices
-    let did_combinator = preceded(tag("DEV_"), take(4 as u8))(vid_combinator.0)?;
+    let did_combinator = preceded(tag("DEV_"), take(4_u8))(vid_combinator.0)?;
     let mut ssid: Option<&str> = None;
     if did_combinator.0.starts_with("&SU") {
-        let ssid_combinator = preceded(tag("&SUBSYS_"), take(4 as u8))(did_combinator.0)?;
+        let ssid_combinator = preceded(tag("&SUBSYS_"), take(4_u8))(did_combinator.0)?;
         ssid = Some(ssid_combinator.1);
     }
 
@@ -114,13 +122,9 @@ fn parse_pcie_db() -> Result<Vec<Vendor>, NomError<'static>> {
     // this is filled up as the db is parsed
     let mut output: Vec<Vendor> = Vec::with_capacity(512);
     let mut iterated_output = read_vendor(header_combinator.0);
-    loop {
-        if let Ok(ref section_output) = iterated_output {
+    while let Ok(ref section_output) = iterated_output {
             output.push(section_output.1.clone());
             iterated_output = read_vendor(section_output.0);
-        } else {
-            break;
-        }
     }
 
     Ok(output)
@@ -133,7 +137,7 @@ fn read_header(input: &str) -> IResult<&str, &str> {
 
 // read a single vendor block and all associated devices/subsystems from the input
 fn read_vendor(input: &str) -> IResult<&str, Vendor> {
-    let vid_combinator = terminated(take(4 as u8), tag("  "))(input)?;
+    let vid_combinator = terminated(take(4_u8), tag("  "))(input)?;
     let vid = vid_combinator.1;
     let vname_combinator = terminated(take_until("\n"), char('\n'))(vid_combinator.0)?;
     let vname = vname_combinator.1;
@@ -149,7 +153,7 @@ fn read_vendor(input: &str) -> IResult<&str, Vendor> {
             iterated_output = read_device(combinator_output.0);
         } else {
             // Some lines have comments, handle those here, this is assuming the next line is indented
-            if leftover.starts_with("#") {
+            if leftover.starts_with('#') {
                 leftover = preceded(take_until("\n"), char('\n'))(leftover)?.0;
                 iterated_output = read_device(leftover);
                 continue;
@@ -170,7 +174,7 @@ fn read_vendor(input: &str) -> IResult<&str, Vendor> {
 
 // read a single device and all associated subsystems (if applicable) from the input
 fn read_device(input: &str) -> IResult<&str, Device> {
-    let did_combinator = preceded(char('\t'), take(4 as usize))(input)?;
+    let did_combinator = preceded(char('\t'), take(4_usize))(input)?;
     let did = did_combinator.1;
     let dname_combinator = delimited(tag("  "), take_until("\n"), char('\n'))(did_combinator.0)?;
 
@@ -186,7 +190,7 @@ fn read_device(input: &str) -> IResult<&str, Device> {
             iterated_output = read_subsystem_line(combinator_output.0);
         } else {
             // Some lines have comments, handle those here, this is assuming the next line is indented
-            if leftover.starts_with("#") {
+            if leftover.starts_with('#') {
                 leftover = preceded(take_until("\n"), char('\n'))(leftover)?.0;
                 iterated_output = read_subsystem_line(leftover);
                 continue;
@@ -211,10 +215,10 @@ fn read_subsystem_line(input: &str) -> IResult<&str, Subsystem> {
     // two spaces, then the name.
 
     // the vid is not needed, but might as well break the parsing down in steps
-    let vid_combinator = delimited(tag("\t\t"), take(4 as u8), char(' '))(input)?;
+    let vid_combinator = delimited(tag("\t\t"), take(4_u8), char(' '))(input)?;
 
     // subsystem id
-    let ssid_combinator = terminated(take(4 as u8), tag("  "))(vid_combinator.0)?;
+    let ssid_combinator = terminated(take(4_u8), tag("  "))(vid_combinator.0)?;
     let ss_name_combinator = terminated(take_until("\n"), char('\n'))(ssid_combinator.0)?;
     Ok((
         ss_name_combinator.0,

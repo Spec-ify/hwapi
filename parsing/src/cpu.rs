@@ -56,7 +56,7 @@ impl CpuCache<'_> {
         debug!("Intel CPU list deserialized");
         let mut intel_index: Vec<IndexEntry> = Vec::with_capacity(512);
         for (i, cpu) in intel_cpus.iter().enumerate() {
-            match generate_index_entry(&cpu.name, i) {
+            match generate_index_entry(cpu.name, i) {
                 Ok(idx) => {
                     intel_index.push(idx);
                 }
@@ -138,15 +138,10 @@ impl CpuCache<'_> {
                 best_idx_match = Some(idx_entry);
             }
         }
-        // let cpus: &Vec<Cpu<_>> = if input.contains("AMD") {
-        //     &self.amd_cpus
-        // } else {
-        //     &self.intel_cpus
-        // };
         match best_idx_match {
             None => {
                 error!("When searching for cpu {:?}, no cpus were found with a matching model number of: {:?}", input, idx_for_input.model);
-                return Err(Box::from("No close matches found"));
+                Err(Box::from("No close matches found"))
             }
             Some(idx_entry) => {
                 if input.contains("AMD") {
@@ -167,8 +162,14 @@ impl CpuCache<'_> {
     }
 }
 
+impl Default for CpuCache<'_> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Take the input model name, and try to parse it into an [IndexEntry] with an index of `index`.
-fn generate_index_entry<'name>(
+fn generate_index_entry(
     name: &str,
     index: usize,
 ) -> Result<IndexEntry, Box<dyn std::error::Error + '_>> {
@@ -229,8 +230,8 @@ fn find_model(input: &str) -> String {
     // iX-14XYZ by the WMI. For now, this is handled by hacking iX and 14XYZ together if the case is detected
     {
         if input.contains("Intel") && best_fit.starts_with("14") {
-            let tokens = input.split(' ');
-            let i_tag = tokens.filter(|t| t.len() == 2 && t.starts_with('i')).nth(0);
+            let mut tokens = input.split(' ');
+            let i_tag = tokens.find(|t| t.len() == 2 && t.starts_with('i'));
             if let Some(t) = i_tag {
                 return format!("{}-{}", t, best_fit);
             }
@@ -249,8 +250,8 @@ fn find_model(input: &str) -> String {
     // iX CPU M 123
     {
         if input.contains("Intel") && input.contains(" M ") && best_fit.len() == 3 {
-            let tokens = input.split(" ");
-            let i_tag = tokens.filter(|t| t.len() == 2 && t.starts_with('i')).nth(0);
+            let mut tokens = input.split(' ');
+            let i_tag = tokens.find(|t| t.len() == 2 && t.starts_with('i'));
             if let Some(t) = i_tag {
                 return format!("{}-{}M", t, best_fit);
             }

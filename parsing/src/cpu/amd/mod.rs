@@ -12,7 +12,7 @@ struct AmdJson {
     data: Vec<HashMap<String, serde_json::Value>>,
 }
 
-pub fn get_amd_cpus<'a>() -> Vec<Cpu<String>> {
+pub fn get_amd_cpus() -> Vec<Cpu<String>> {
     let deserialized_json = deserialize_json();
     process_json(deserialized_json)
 }
@@ -23,7 +23,7 @@ fn deserialize_json() -> AmdJson {
 }
 
 /// Take a struct directly from the json and format it into a vec of [Cpu]
-fn process_json<'a>(json: AmdJson) -> Vec<Cpu<String>> {
+fn process_json(json: AmdJson) -> Vec<Cpu<String>> {
     let mut output: Vec<Cpu<String>> = Vec::with_capacity(json.data.len());
     for raw_data in json.data {
         // first strip out some stray keys that appear to be cruft

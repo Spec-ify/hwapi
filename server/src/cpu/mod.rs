@@ -51,7 +51,7 @@ impl CpuCache {
     pub fn new() -> Self {
         let mut intel_index: Vec<IndexEntry> = Vec::with_capacity(512);
         for name in INTEL_CPUS.keys() {
-            match generate_index_entry(&name) {
+            match generate_index_entry(name) {
                 Ok(idx) => {
                     intel_index.push(idx);
                 }
@@ -63,7 +63,7 @@ impl CpuCache {
         debug!("Index generated for Intel CPUs");
         let mut amd_index: Vec<IndexEntry> = Vec::with_capacity(2048);
         for name in AMD_CPUS.keys() {
-            match generate_index_entry(&name) {
+            match generate_index_entry(name) {
                 Ok(idx) => {
                     amd_index.push(idx);
                 }
@@ -136,15 +136,15 @@ impl CpuCache {
         match best_idx_match {
             None => {
                 error!("When searching for cpu {:?}, no cpus were found with a matching model number of: {:?}", input, idx_for_input.model);
-                return Err(Box::from("No close matches found"));
+                Err(Box::from("No close matches found"))
             }
             Some(idx_entry) => {
                 if input.contains("AMD") {
                     let entry = AMD_CPUS.get_entry(&idx_entry.key).unwrap();
-                    return Ok(Cpu::from((*entry.0, entry.1)));
+                    Ok(Cpu::from((*entry.0, entry.1)))
                 } else {
                     let entry = INTEL_CPUS.get_entry(&idx_entry.key).unwrap();
-                    return Ok(Cpu::from((*entry.0, entry.1)));
+                    Ok(Cpu::from((*entry.0, entry.1)))
                 }
                 // // intel requires some work to un-zerocopy data
                 // let found_cpu = &self.intel_cpus[idx_entry.key];
@@ -161,8 +161,8 @@ impl CpuCache {
     }
 }
 
-/// Take the input model name, and try to parse it into an [IndexEntry] with an index of `index`.
-fn generate_index_entry<'name>(name: &str) -> Result<IndexEntry, Box<dyn std::error::Error + '_>> {
+/// Take the input model name, and try to parse it into an [IndexEntry]
+fn generate_index_entry(name: &str) -> Result<IndexEntry, Box<dyn std::error::Error + '_>> {
     let model_token = find_model(name);
     // find the prefix, if one exists
     let prefix_combinator: (&str, &str) =
@@ -220,8 +220,8 @@ fn find_model(input: &str) -> String {
     // iX-14XYZ by the WMI. For now, this is handled by hacking iX and 14XYZ together if the case is detected
     {
         if input.contains("Intel") && best_fit.starts_with("14") {
-            let tokens = input.split(' ');
-            let i_tag = tokens.filter(|t| t.len() == 2 && t.starts_with('i')).nth(0);
+            let mut tokens = input.split(' ');
+            let i_tag = tokens.find(|t| t.len() == 2 && t.starts_with('i'));
             if let Some(t) = i_tag {
                 return format!("{}-{}", t, best_fit);
             }
@@ -240,8 +240,8 @@ fn find_model(input: &str) -> String {
     // iX CPU M 123
     {
         if input.contains("Intel") && input.contains(" M ") && best_fit.len() == 3 {
-            let tokens = input.split(" ");
-            let i_tag = tokens.filter(|t| t.len() == 2 && t.starts_with('i')).nth(0);
+            let mut tokens = input.split(' ');
+            let i_tag = tokens.find(|t| t.len() == 2 && t.starts_with('i'));
             if let Some(t) = i_tag {
                 return format!("{}-{}M", t, best_fit);
             }

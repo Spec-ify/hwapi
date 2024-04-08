@@ -69,6 +69,12 @@ impl UsbCache {
     }
 }
 
+impl Default for UsbCache {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// This function searches the input string for a vendor id (vid) and product id (pid).
 /// Input strings in the form of `USB\VID_1234&PID_5678\9479493` are assumed.
 /// It returns a tuple, where the first value is the vendor id, and the second is the product id. This tuple contains substrings of the initial input string,
@@ -76,8 +82,8 @@ impl UsbCache {
 fn parse_device_identifier(device_string: &str) -> Result<(u16, u16), NomError> {
     // https://learn.microsoft.com/en-us/windows-hardware/drivers/install/standard-usb-identifiers
     // TODO: this does not fully support all formats of usb device identifiers
-    let vid_combinator = delimited(tag("USB\\VID_"), take(4 as u8), take(1 as u8))(device_string)?;
-    let pid_combinator = preceded(tag("PID_"), take(4 as u8))(vid_combinator.0)?;
+    let vid_combinator = delimited(tag("USB\\VID_"), take(4_u8), take(1_u8))(device_string)?;
+    let pid_combinator = preceded(tag("PID_"), take(4_u8))(vid_combinator.0)?;
     Ok((
         u16::from_str_radix(vid_combinator.1, 16).unwrap(),
         u16::from_str_radix(pid_combinator.1, 16).unwrap(),
@@ -91,13 +97,9 @@ fn parse_usb_db() -> Vec<Vendor> {
     let header_combinator_output = read_header(file_as_str).unwrap();
     let mut output: Vec<Vendor> = Vec::with_capacity(1024);
     let mut iterated_output = read_vendor(header_combinator_output.0);
-    loop {
-        if let Ok(ref section_output) = iterated_output {
+    while let Ok(ref section_output) = iterated_output {
             output.push(section_output.1.clone());
             iterated_output = read_vendor(section_output.0);
-        } else {
-            break;
-        }
     }
     output
 }
@@ -130,7 +132,7 @@ fn read_vendor(input: &str) -> IResult<&str, Vendor> {
             iterated_output = read_device_line(combinator_output.0);
         } else {
             // Some lines have comments, handle those here, this is assuming the next line is indented
-            if leftover.starts_with("#") {
+            if leftover.starts_with('\t') {
                 leftover = take_until("\t")(leftover)?.0;
                 iterated_output = read_device_line(leftover);
                 continue;
@@ -153,8 +155,8 @@ fn read_vendor(input: &str) -> IResult<&str, Vendor> {
 fn read_device_line(input: &str) -> IResult<&str, Device> {
     let combinator_output = delimited(char('\t'), take_until("\n"), char('\n'))(input)?;
     // read the device id and device name
-    let did_combinator_output = take(4 as u8)(combinator_output.1)?;
-    let dname = take(2 as u8)(did_combinator_output.0)?.0;
+    let did_combinator_output = take(4_u8)(combinator_output.1)?;
+    let dname = take(2_u8)(did_combinator_output.0)?.0;
     Ok((
         combinator_output.0,
         Device {
