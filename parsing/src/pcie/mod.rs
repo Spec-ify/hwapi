@@ -59,10 +59,7 @@ impl PcieCache {
         Self { vendors }
     }
 
-    pub fn find<'a>(
-        &'a self,
-        input: &'a str,
-    ) -> Result<PcieDeviceInfo, NomError> {
+    pub fn find<'a>(&'a self, input: &'a str) -> Result<PcieDeviceInfo, NomError> {
         let parsed_identifier = parse_device_identifier(input)?;
         // search for a vendor
         let vendor = self.vendors.get(&parsed_identifier.0);
@@ -123,8 +120,8 @@ fn parse_pcie_db() -> Result<Vec<Vendor>, NomError<'static>> {
     let mut output: Vec<Vendor> = Vec::with_capacity(512);
     let mut iterated_output = read_vendor(header_combinator.0);
     while let Ok(ref section_output) = iterated_output {
-            output.push(section_output.1.clone());
-            iterated_output = read_vendor(section_output.0);
+        output.push(section_output.1.clone());
+        iterated_output = read_vendor(section_output.0);
     }
 
     Ok(output)

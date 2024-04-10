@@ -3,9 +3,7 @@ use std::collections::{HashMap, HashSet};
 use log::{debug, error};
 use nom::bytes::complete::{take_until, take_while};
 use serde::Serialize;
-// #[path = "cpu/amd/mod.rs"]
 mod amd;
-// #[path = "cpu/intel/mod.rs"]
 mod intel;
 
 use amd::get_amd_cpus;

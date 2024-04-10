@@ -1,6 +1,3 @@
-// #[path = "src/cpu.rs"]
-// mod cpu;
-// use cpu::CpuCache;
 use parsing::cpu::CpuCache;
 use std::collections::HashSet;
 use std::fs::File;
@@ -9,7 +6,6 @@ use std::path::Path;
 
 fn main() {
     // TODO: configure cargo to rerun only if the database changes
-    // precompile the database for AMD CPUs
     println!("cargo::rerun-if-changed=../parsing/src/cpu/amd/input.json");
     println!("cargo::rerun-if-changed=../parsing/src/cpu/intel/chunks/*");
     gen_amd_cpus();

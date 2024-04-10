@@ -98,8 +98,8 @@ fn parse_usb_db() -> Vec<Vendor> {
     let mut output: Vec<Vendor> = Vec::with_capacity(1024);
     let mut iterated_output = read_vendor(header_combinator_output.0);
     while let Ok(ref section_output) = iterated_output {
-            output.push(section_output.1.clone());
-            iterated_output = read_vendor(section_output.0);
+        output.push(section_output.1.clone());
+        iterated_output = read_vendor(section_output.0);
     }
     output
 }
