@@ -17,7 +17,7 @@ pub fn parse_csv(csv: &'_ str) -> Result<Vec<Cpu<&str>>, Box<dyn Error + '_>> {
             // the first item in each record is the label, the items are in columns with the cpus
             let entry = record[i + 1];
             if !entry.is_empty() {
-                cpu.attributes.insert(&record[0], &entry);
+                cpu.attributes.insert(record[0], entry);
             }
         }
         output.push(cpu);

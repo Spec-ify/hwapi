@@ -1,13 +1,13 @@
-use std::collections::{HashMap, HashSet};
+mod amd_codegen;
+mod intel_codegen;
 
+use amd_codegen::AMD_CPUS;
+use intel_codegen::INTEL_CPUS;
 use log::{debug, error};
 use nom::bytes::complete::{take_until, take_while};
+use phf::Map;
 use serde::Serialize;
-mod amd;
-mod intel;
-
-use amd::get_amd_cpus;
-use intel::get_intel_cpus;
+use std::collections::{HashMap, HashSet};
 
 /// A generic representation of a cpu. T is the string type, there are massive gains by using zero copy for the intel cpu database, but that's a lot more work
 /// for the amd CPU database.
@@ -21,6 +21,7 @@ pub struct Cpu<T> {
     pub attributes: HashMap<T, T>,
 }
 
+// TODO: &'static str all of this
 #[derive(PartialEq, Clone)]
 struct IndexEntry {
     /// The primary identifier for a processor, like:
@@ -35,59 +36,50 @@ struct IndexEntry {
     /// Similar to modifiers, but they're not directly a part of the processor, like:
     /// `PRO` in `Ryzen 5 PRO 5600`
     tags: HashSet<String>,
-    /// The index of the corresponding cpu in the "full" vec
-    index: usize,
+    /// The full name of the cpu, so that it can be fetched from the map
+    key: String,
 }
 
 #[derive(Clone)]
-pub struct CpuCache<'a> {
-    intel_cpus: Vec<Cpu<&'a str>>,
+pub struct CpuCache {
     intel_index: Vec<IndexEntry>,
-    amd_cpus: Vec<Cpu<String>>,
     amd_index: Vec<IndexEntry>,
 }
 
-impl CpuCache<'_> {
+impl CpuCache {
     /// Create a new cache and parse the cpu databases into memory
     pub fn new() -> Self {
-        let mut intel_cpus = get_intel_cpus();
-        debug!("Intel CPU list deserialized");
         let mut intel_index: Vec<IndexEntry> = Vec::with_capacity(512);
-        for (i, cpu) in intel_cpus.iter().enumerate() {
-            match generate_index_entry(&cpu.name, i) {
+        for name in INTEL_CPUS.keys() {
+            match generate_index_entry(name) {
                 Ok(idx) => {
                     intel_index.push(idx);
                 }
                 Err(e) => {
-                    error!("index will not be complete because generation generation failed for cpu: {:?} with error {:?}", cpu.name, e);
+                    error!("index will not be complete because generation generation failed for cpu: {:?} with error {:?}", name, e);
                 }
             }
         }
         debug!("Index generated for Intel CPUs");
-        let mut amd_cpus = get_amd_cpus();
-        debug!("Amd CPU list deserialized");
         let mut amd_index: Vec<IndexEntry> = Vec::with_capacity(2048);
-        for (i, cpu) in amd_cpus.iter().enumerate() {
-            match generate_index_entry(&cpu.name, i) {
+        for name in AMD_CPUS.keys() {
+            match generate_index_entry(name) {
                 Ok(idx) => {
                     amd_index.push(idx);
                 }
                 Err(e) => {
-                    error!("index will not be complete because generation generation failed for cpu: {:?} with error {:?}", cpu.name, e);
+                    error!("index will not be complete because generation generation failed for cpu: {:?} with error {:?}", name, e);
                 }
             }
         }
+        debug!("Index generated for AMD CPUs");
         // because of the way memory allocations for vectors are done, over time, a lot of empty elements can get pre-allocated.
         // remove those now
-        intel_cpus.shrink_to_fit();
-        amd_cpus.shrink_to_fit();
         intel_index.shrink_to_fit();
         amd_index.shrink_to_fit();
 
         Self {
-            intel_cpus,
             intel_index,
-            amd_cpus,
             amd_index,
         }
     }
@@ -100,13 +92,13 @@ impl CpuCache<'_> {
     pub fn find<'a>(
         &'a mut self,
         input: &'a str,
-    ) -> Result<Cpu<String>, Box<dyn std::error::Error + '_>> {
+    ) -> Result<Cpu<&'static str>, Box<dyn std::error::Error + '_>> {
         let index = if input.contains("AMD") {
             &self.amd_index
         } else {
             &self.intel_index
         };
-        let idx_for_input = generate_index_entry(input, 0)?;
+        let idx_for_input = generate_index_entry(input)?;
         // first look for an index entry that has an exact match for the processor model number
         let similar_cpus = index.iter().filter(|idx| idx.model == idx_for_input.model);
         // now find the closest fit among all similar cpus
@@ -144,32 +136,33 @@ impl CpuCache<'_> {
         match best_idx_match {
             None => {
                 error!("When searching for cpu {:?}, no cpus were found with a matching model number of: {:?}", input, idx_for_input.model);
-                return Err(Box::from("No close matches found"));
+                Err(Box::from("No close matches found"))
             }
             Some(idx_entry) => {
                 if input.contains("AMD") {
-                    return Ok(self.amd_cpus[idx_entry.index].clone());
+                    let entry = AMD_CPUS.get_entry(&idx_entry.key).unwrap();
+                    Ok(Cpu::from((*entry.0, entry.1)))
+                } else {
+                    let entry = INTEL_CPUS.get_entry(&idx_entry.key).unwrap();
+                    Ok(Cpu::from((*entry.0, entry.1)))
                 }
-                // intel requires some work to un-zerocopy data
-                let found_cpu = &self.intel_cpus[idx_entry.index];
-                return Ok(Cpu {
-                    name: found_cpu.name.to_string(),
-                    attributes: found_cpu
-                        .attributes
-                        .iter()
-                        .map(|(k, v)| (k.to_string(), v.to_string()))
-                        .collect(),
-                });
+                // // intel requires some work to un-zerocopy data
+                // let found_cpu = &self.intel_cpus[idx_entry.key];
+                // return Ok(Cpu {
+                //     name: found_cpu.name.to_string(),
+                //     attributes: found_cpu
+                //         .attributes
+                //         .iter()
+                //         .map(|(k, v)| (k.to_string(), v.to_string()))
+                //         .collect(),
+                // });
             }
         }
     }
 }
 
-/// Take the input model name, and try to parse it into an [IndexEntry] with an index of `index`.
-fn generate_index_entry<'name>(
-    name: &str,
-    index: usize,
-) -> Result<IndexEntry, Box<dyn std::error::Error + '_>> {
+/// Take the input model name, and try to parse it into an [IndexEntry]
+fn generate_index_entry(name: &str) -> Result<IndexEntry, Box<dyn std::error::Error + '_>> {
     let model_token = find_model(name);
     // find the prefix, if one exists
     let prefix_combinator: (&str, &str) =
@@ -202,7 +195,7 @@ fn generate_index_entry<'name>(
         // just whatever is leftover after the combinator
         suffix: String::from(model_combinator.1),
         tags,
-        index,
+        key: String::from(name),
     })
 }
 
@@ -227,8 +220,8 @@ fn find_model(input: &str) -> String {
     // iX-14XYZ by the WMI. For now, this is handled by hacking iX and 14XYZ together if the case is detected
     {
         if input.contains("Intel") && best_fit.starts_with("14") {
-            let tokens = input.split(' ');
-            let i_tag = tokens.filter(|t| t.len() == 2 && t.starts_with('i')).nth(0);
+            let mut tokens = input.split(' ');
+            let i_tag = tokens.find(|t| t.len() == 2 && t.starts_with('i'));
             if let Some(t) = i_tag {
                 return format!("{}-{}", t, best_fit);
             }
@@ -247,8 +240,8 @@ fn find_model(input: &str) -> String {
     // iX CPU M 123
     {
         if input.contains("Intel") && input.contains(" M ") && best_fit.len() == 3 {
-            let tokens = input.split(" ");
-            let i_tag = tokens.filter(|t| t.len() == 2 && t.starts_with('i')).nth(0);
+            let mut tokens = input.split(' ');
+            let i_tag = tokens.find(|t| t.len() == 2 && t.starts_with('i'));
             if let Some(t) = i_tag {
                 return format!("{}-{}M", t, best_fit);
             }
@@ -276,6 +269,19 @@ fn calculate_model_score(token: &str) -> isize {
         }
     }
     score
+}
+
+impl From<(&'static str, &Map<&str, &str>)> for Cpu<&'static str> {
+    fn from(value: (&'static str, &Map<&str, &str>)) -> Self {
+        let mut attributes = HashMap::new();
+        for a in value.1.into_iter() {
+            attributes.insert(*a.0, *a.1);
+        }
+        Self {
+            name: value.0,
+            attributes,
+        }
+    }
 }
 
 #[cfg(test)]

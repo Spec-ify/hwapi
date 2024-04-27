@@ -5,7 +5,7 @@ use nom::bytes::complete::{tag, take_until};
 use nom::sequence::{delimited, terminated};
 use nom::IResult;
 
-use crate::NomError;
+type NomError<'a> = nom::Err<nom::error::Error<&'a str>>;
 
 /// Everything deserialized by the lexer
 #[derive(Debug)]
