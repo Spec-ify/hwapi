@@ -1,10 +1,19 @@
-use crate::cpu::Cpu;
-use crate::AppState;
+//! This crate contains the Axum handlers used by the server.
+use databases::cpu::Cpu;
+use databases::{cpu::CpuCache, usb::UsbCache, pcie::PcieCache};
 use axum::extract::Query;
 use axum::http::StatusCode;
 use axum::{extract::State, Json};
 use log::{error, warn};
 use serde::{Deserialize, Serialize};
+
+
+#[derive(Clone)]
+pub struct AppState {
+    pub cpu_cache: CpuCache,
+    pub usb_cache: UsbCache,
+    pub pcie_cache: PcieCache,
+}
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct UsbQuery {

@@ -1,0 +1,35 @@
+[package]
+name = "databases"
+version = "0.1.0"
+edition = "2021"
+
+[build-dependencies]
+parsing = { path = "../parsing" }
+phf_codegen = "0.11.2"
+
+[dependencies]
+parsing = { path = "../parsing" }
+chrono = "0.4.32"
+nom = "7.1.3"
+log = "0.4.20"
+serde = { version = "1.0.195", features = ["derive"] }
+phf = { version = "0.11.2", features = ["macros"] }
+
+[dev-dependencies]
+criterion = "0.5.1"
+
+[[bench]]
+name = "usb"
+harness = false
+
+[[bench]]
+name = "pcie"
+harness = false
+
+[[bench]]
+name = "cpu_amd"
+harness = false
+
+[[bench]]
+name = "cpu_intel"
+harness = false

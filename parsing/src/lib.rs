@@ -1,3 +1,5 @@
+//! This crate contains the code dedicated to parsing the various databases.
+
 pub mod cpu;
 pub mod pcie;
 pub mod usb;

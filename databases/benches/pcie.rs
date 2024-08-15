@@ -1,5 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use parsing::pcie::PcieCache;
+use databases::pcie::PcieCache;
 
 pub fn criterion_benchmark(c: &mut Criterion) {
     let cache = PcieCache::new();

@@ -1,20 +1,19 @@
-pub mod cpu;
-pub mod handlers;
+//! This module contains the code centered around the actual server binary. It relies on handlers from the `handlers` crate, which fetch data from
+//! interfaces provided by the `database` crate, which rely on data parsed by the `parsing` crate.
 
-use axum::http::HeaderValue;
+use axum::http::{header, HeaderValue, Method};
 use axum::routing::post;
 use axum::{routing::get, Router};
 use chrono::Local;
 use clap::builder::TypedValueParser;
 use clap::{Parser, ValueEnum};
 use colored::*;
-use cpu::CpuCache;
 use handlers::*;
-use http::{header, Method};
 use log::info;
 use log::{Level, LevelFilter, Metadata, Record};
-use parsing::pcie::PcieCache;
-use parsing::usb::UsbCache;
+use databases::cpu::CpuCache;
+use databases::pcie::PcieCache;
+use databases::usb::UsbCache;
 use std::env;
 use tower_http::cors::CorsLayer;
 
@@ -77,13 +76,6 @@ struct Args {
 }
 
 static LOGGER: SimpleLogger = SimpleLogger;
-
-#[derive(Clone)]
-pub struct AppState {
-    pub cpu_cache: CpuCache,
-    pub usb_cache: UsbCache,
-    pub pcie_cache: PcieCache,
-}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

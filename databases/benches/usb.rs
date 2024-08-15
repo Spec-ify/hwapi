@@ -1,5 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use parsing::usb::UsbCache;
+use databases::usb::UsbCache;
 
 pub fn criterion_benchmark(c: &mut Criterion) {
     let cache = UsbCache::new();

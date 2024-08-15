@@ -7,7 +7,7 @@ use std::path::Path;
 fn main() {
     // TODO: configure cargo to rerun only if the database changes
     // println!("cargo::rerun-if-changed=../parsing/src/cpu/amd/input.json");
-    println!("cargo::rerun-if-changed=build.rs");
+    // println!("cargo::rerun-if-changed=build.rs");
     gen_amd_cpus();
     gen_intel_cpus();
 }

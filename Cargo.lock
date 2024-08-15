@@ -393,6 +393,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7a81dae078cea95a014a339291cec439d2f232ebe854a9d672b796c6afafa9b7"
 
 [[package]]
+name = "databases"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "criterion",
+ "log",
+ "nom",
+ "parsing",
+ "phf",
+ "phf_codegen",
+ "serde",
+]
+
+[[package]]
 name = "either"
 version = "1.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -460,6 +474,18 @@ checksum = "6dd08c532ae367adf81c312a4580bc67f1d0fe8bc9c460520283f4c0ff277888"
 dependencies = [
  "cfg-if",
  "crunchy",
+]
+
+[[package]]
+name = "handlers"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "databases",
+ "log",
+ "parsing",
+ "serde",
+ "tower-http",
 ]
 
 [[package]]
@@ -534,14 +560,10 @@ dependencies = [
  "chrono",
  "clap",
  "colored",
- "criterion",
- "http",
+ "databases",
+ "handlers",
  "log",
- "nom",
  "parsing",
- "phf",
- "phf_codegen",
- "serde",
  "tokio",
  "tower-http",
 ]
