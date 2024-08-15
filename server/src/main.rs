@@ -1,5 +1,5 @@
-mod cpu;
-mod handlers;
+pub mod cpu;
+pub mod handlers;
 
 use axum::http::HeaderValue;
 use axum::routing::post;
@@ -79,7 +79,7 @@ struct Args {
 static LOGGER: SimpleLogger = SimpleLogger;
 
 #[derive(Clone)]
-struct AppState {
+pub struct AppState {
     pub cpu_cache: CpuCache,
     pub usb_cache: UsbCache,
     pub pcie_cache: PcieCache,

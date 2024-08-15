@@ -40,14 +40,15 @@ struct IndexEntry {
 }
 
 #[derive(Clone)]
-pub struct CpuCache<'a> {
+/// The created during parsing and used by the build script.
+pub struct IntermediateCpuCache<'a> {
     pub intel_cpus: Vec<Cpu<&'a str>>,
     intel_index: Vec<IndexEntry>,
     pub amd_cpus: Vec<Cpu<String>>,
     amd_index: Vec<IndexEntry>,
 }
 
-impl CpuCache<'_> {
+impl IntermediateCpuCache<'_> {
     /// Create a new cache and parse the cpu databases into memory
     pub fn new() -> Self {
         let mut intel_cpus = get_intel_cpus();
@@ -160,7 +161,7 @@ impl CpuCache<'_> {
     }
 }
 
-impl Default for CpuCache<'_> {
+impl Default for IntermediateCpuCache<'_> {
     fn default() -> Self {
         Self::new()
     }
@@ -281,11 +282,11 @@ fn calculate_model_score(token: &str) -> isize {
 
 #[cfg(test)]
 mod tests {
-    use super::CpuCache;
+    use super::IntermediateCpuCache;
 
     #[test]
     fn search_resilience() {
-        let mut cache = CpuCache::new();
+        let mut cache = IntermediateCpuCache::new();
         // on the left is the name stored in the cache, on the right is the name collected from WMI data
         // these test cases should be filled out as time goes on with failing test cases
         // any test cases commented out currently fail

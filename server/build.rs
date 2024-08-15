@@ -1,4 +1,4 @@
-use parsing::cpu::CpuCache;
+use parsing::cpu::IntermediateCpuCache;
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::{BufWriter, Write};
@@ -19,7 +19,7 @@ fn gen_amd_cpus() {
     let mut generated_map = phf_codegen::Map::new();
     // there are a few duplicate entries, so this is quick and dirty way to do duplicate detection
     let mut entries: HashSet<String> = HashSet::new();
-    let cpu_cache = CpuCache::new();
+    let cpu_cache = IntermediateCpuCache::new();
     for cpu in cpu_cache.amd_cpus {
         let mut attributes_map = phf_codegen::Map::new();
         // if an entry wasn't already added
@@ -46,7 +46,7 @@ fn gen_intel_cpus() {
     let mut generated_map = phf_codegen::Map::new();
     // there are a few duplicate entries, so this is quick and dirty way to do duplicate detection
     let mut entries: HashSet<String> = HashSet::new();
-    let cpu_cache = CpuCache::new();
+    let cpu_cache = IntermediateCpuCache::new();
     for cpu in cpu_cache.intel_cpus {
         let mut attributes_map = phf_codegen::Map::new();
         // if an entry wasn't already added

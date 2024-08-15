@@ -23,3 +23,18 @@ serde = { version = "1.0.195", features = ["derive"] }
 phf = { version = "0.11.2", features = ["macros"] }
 tokio = { version = "1.35.1", features = ["full"] }
 tower-http = { version = "0.5.1", features = ["cors"] }
+
+[dev-dependencies]
+criterion = "0.5.1"
+
+[[bench]]
+name = "usb"
+harness = false
+
+[[bench]]
+name = "pcie"
+harness = false
+
+[[bench]]
+name = "cpu_amd"
+harness = false
