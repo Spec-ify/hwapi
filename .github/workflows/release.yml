@@ -3,6 +3,7 @@
 # .github/workflows/release.yml
 
 on:
+  workflow_dispatch: 
   release:
     types: [created]
 
@@ -21,4 +22,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          SRCDIR: server/
           RUSTTARGET: ${{ matrix.target }}
