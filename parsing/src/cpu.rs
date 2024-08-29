@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-use log::{debug, error};
+use tracing::{debug, error};
 use nom::bytes::complete::{take_until, take_while};
 use serde::Serialize;
 mod amd;

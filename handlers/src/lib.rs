@@ -4,7 +4,7 @@ use databases::{cpu::CpuCache, usb::UsbCache, pcie::PcieCache};
 use axum::extract::Query;
 use axum::http::StatusCode;
 use axum::{extract::State, Json};
-use log::{error, warn};
+use tracing::{error, warn};
 use serde::{Deserialize, Serialize};
 
 

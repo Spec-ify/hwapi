@@ -3,7 +3,7 @@ mod intel_codegen;
 
 use amd_codegen::AMD_CPUS;
 use intel_codegen::INTEL_CPUS;
-use log::{debug, error};
+use tracing::{debug, error};
 use nom::bytes::complete::{take_until, take_while};
 use phf::Map;
 use serde::Serialize;

@@ -1,64 +1,64 @@
 //! This module contains the code centered around the actual server binary. It relies on handlers from the `handlers` crate, which fetch data from
 //! interfaces provided by the `database` crate, which rely on data parsed by the `parsing` crate.
 
+use axum::extract::{MatchedPath, Request};
 use axum::http::{header, HeaderValue, Method};
 use axum::routing::post;
 use axum::{routing::get, Router};
-use chrono::Local;
 use clap::builder::TypedValueParser;
-use clap::{Parser, ValueEnum};
-use colored::*;
-use handlers::*;
-use log::info;
-use log::{Level, LevelFilter, Metadata, Record};
+use clap::Parser;
 use databases::cpu::CpuCache;
 use databases::pcie::PcieCache;
 use databases::usb::UsbCache;
+use handlers::*;
 use std::env;
 use tower_http::cors::CorsLayer;
+use tower_http::trace::TraceLayer;
+use tracing::{info, info_span, Level};
+use tracing_subscriber::fmt::format::FmtSpan;
 
-/// Because the error that nom uses is rather lengthy and unintuitive, it's defined here
-/// to simplify handling
-// pub type NomError<'a> = nom::Err<nom::error::Error<&'a str>>;
-/// https://docs.rs/log/latest/log/#implementing-a-logger
-struct SimpleLogger;
+// /// Because the error that nom uses is rather lengthy and unintuitive, it's defined here
+// /// to simplify handling
+// // pub type NomError<'a> = nom::Err<nom::error::Error<&'a str>>;
+// /// https://docs.rs/log/latest/log/#implementing-a-logger
+// struct SimpleLogger;
 
-impl log::Log for SimpleLogger {
-    fn enabled(&self, _: &Metadata) -> bool {
-        // this is configured by calling log::set_max_level, and so this logging implementation logs all kinds of levels
-        true
-    }
+// impl log::Log for SimpleLogger {
+//     fn enabled(&self, _: &Metadata) -> bool {
+//         // this is configured by calling log::set_max_level, and so this logging implementation logs all kinds of levels
+//         true
+//     }
 
-    fn log(&self, record: &Record) {
-        if self.enabled(record.metadata()) {
-            let level = match record.level() {
-                Level::Info => format!("{}", record.level()).bold().blue(),
-                Level::Warn => format!("{}", record.level()).bold().yellow(),
-                Level::Error => format!("{}", record.level()).bold().red(),
-                Level::Debug => format!("{}", record.level()).bold().green(),
-                Level::Trace => format!("{}", record.level()).bold().cyan(),
-            };
-            println!(
-                "({})[{}] {}",
-                Local::now().to_rfc2822(),
-                level,
-                record.args()
-            );
-        }
-    }
+//     fn log(&self, record: &Record) {
+//         if self.enabled(record.metadata()) {
+//             let level = match record.level() {
+//                 Level::Info => format!("{}", record.level()).bold().blue(),
+//                 Level::Warn => format!("{}", record.level()).bold().yellow(),
+//                 Level::Error => format!("{}", record.level()).bold().red(),
+//                 Level::Debug => format!("{}", record.level()).bold().green(),
+//                 Level::Trace => format!("{}", record.level()).bold().cyan(),
+//             };
+//             println!(
+//                 "({})[{}] {}",
+//                 Local::now().to_rfc2822(),
+//                 level,
+//                 record.args()
+//             );
+//         }
+//     }
 
-    fn flush(&self) {}
-}
+//     fn flush(&self) {}
+// }
 
-#[derive(ValueEnum, Clone)]
-enum LoggingLevel {
-    Silent,
-    Error,
-    Warning,
-    Info,
-    Debug,
-    Trace,
-}
+// #[derive(ValueEnum, Clone)]
+// enum LoggingLevel {
+//     Silent,
+//     Error,
+//     Warning,
+//     Info,
+//     Debug,
+//     Trace,
+// }
 
 #[derive(Parser)]
 struct Args {
@@ -68,23 +68,25 @@ struct Args {
     /// Level of logging verbosity
     #[arg(short = 'v',
         long = "verbosity",
-        default_value_t = LevelFilter::Info,
+        default_value_t = Level::INFO,
         value_parser = clap::builder::PossibleValuesParser::new(["TRACE", "DEBUG", "INFO", "WARN", "ERROR", "OFF"])
-            .map(|s| s.to_lowercase().parse::<LevelFilter>().unwrap())
+            .map(|s| s.to_lowercase().parse::<Level>().unwrap())
         )]
-    logging_level: LevelFilter,
+    logging_level: Level,
 }
 
-static LOGGER: SimpleLogger = SimpleLogger;
+// static LOGGER: SimpleLogger = SimpleLogger;
 
-// The production VM is heavily limited by logical cpu cores, and Tokio blocks till completion by default
 #[tokio::main(flavor = "multi_thread", worker_threads = 10)]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // initialize logging
     let cli_args = Args::parse();
-    log::set_logger(&LOGGER)
-        .map(|()| log::set_max_level(cli_args.logging_level))
-        .unwrap();
+    tracing_subscriber::fmt()
+        .with_span_events(FmtSpan::CLOSE)
+        .init();
+    // log::set_logger(&LOGGER)
+    //     .map(|()| log::set_max_level(cli_args.logging_level))
+    //     .unwrap();
     info!("Application started");
     // parse command line arguments
     // create a new http router and register respective routes and handlers
@@ -99,6 +101,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .allow_methods([Method::GET, Method::POST])
                 .allow_headers([header::ACCEPT, header::CONTENT_TYPE])
                 .allow_origin("*".parse::<HeaderValue>().unwrap()),
+        )
+        .layer(
+            TraceLayer::new_for_http().make_span_with(|request: &Request<_>| {
+                // Log the matched route's path (with placeholders not filled in).
+                // Use request.uri() or OriginalUri if you want the real path.
+                let matched_path = request
+                    .extensions()
+                    .get::<MatchedPath>()
+                    .map(MatchedPath::as_str);
+                info_span!(
+                    "http_request",
+                    method = ?request.method(),
+                    path=matched_path,
+                    some_other_field = tracing::field::Empty,
+                )
+            }),
         )
         .with_state(AppState {
             cpu_cache: CpuCache::new(),
