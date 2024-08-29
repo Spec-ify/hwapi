@@ -77,7 +77,8 @@ struct Args {
 
 static LOGGER: SimpleLogger = SimpleLogger;
 
-#[tokio::main]
+// The production VM is heavily limited by logical cpu cores, and Tokio blocks till completion by default
+#[tokio::main(flavor = "multi_thread", worker_threads = 10)]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // initialize logging
     let cli_args = Args::parse();

@@ -4,6 +4,14 @@ This API provides a backend for fetching information about hardware.
 Current information fetched includes:
 - CPU info (Intel ARK, AMD Product Database)
 - USB info (VID/PID mapping)
+- PCIe info (VID/PID/SUBSYS mapping)
+
+## Project layout
+The code is organized into 4 separate crates:
+- `parsing`: The code for parsing the raw databases into Rust abstractions.
+- `databases`: The interfaces for fast lookup from those databases.
+- `handlers`: The HTTP endpoint code
+- `server`: The binary and runtime specific details
 
 ## Building
 Building this project requires installing the rust toolchain.
