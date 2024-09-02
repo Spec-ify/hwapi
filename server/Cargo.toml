@@ -12,7 +12,7 @@ handlers = { path = "../handlers" }
 axum = "0.7.4"
 chrono = "0.4.32"
 clap = { version = "4.0", features = ["derive"] }
-tokio = { version = "1.35.1", features = ["full"] }
+tokio = { version = "1.40.0", features = ["full"] }
 tower-http = { version = "0.5.1", features = ["cors", "trace"] }
 tracing = "0.1.40"
 tracing-subscriber = "0.3.18"
