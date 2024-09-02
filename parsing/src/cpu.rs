@@ -1,8 +1,8 @@
 use std::collections::{HashMap, HashSet};
 
-use tracing::{debug, error};
 use nom::bytes::complete::{take_until, take_while};
 use serde::Serialize;
+use tracing::{debug, error};
 mod amd;
 mod intel;
 

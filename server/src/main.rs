@@ -91,6 +91,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // parse command line arguments
     // create a new http router and register respective routes and handlers
     let app = Router::new()
+        .route("/api/hello/", get(|| async { "hi mom!" }))
         .route("/api/cpus/", get(get_cpu_handler))
         .route("/api/usbs/", get(get_usb_handler))
         .route("/api/usbs/", post(post_usbs_handler))

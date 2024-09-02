@@ -3,11 +3,11 @@ mod intel_codegen;
 
 use amd_codegen::AMD_CPUS;
 use intel_codegen::INTEL_CPUS;
-use tracing::{debug, error};
 use nom::bytes::complete::{take_until, take_while};
 use phf::Map;
 use serde::Serialize;
 use std::collections::{HashMap, HashSet};
+use tracing::{debug, error};
 
 /// A generic representation of a cpu. T is the string type, there are massive gains by using zero copy for the intel cpu database, but that's a lot more work
 /// for the amd CPU database.
@@ -89,6 +89,7 @@ impl CpuCache {
     /// and return the entry with a `name` of "AMD Ryzen™ 5 3600".
     ///
     /// A mutable reference is required so that the comparison cache can be shared between calls
+    #[tracing::instrument(skip(self))]
     pub fn find<'a>(
         &'a mut self,
         input: &'a str,

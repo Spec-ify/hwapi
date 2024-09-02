@@ -59,6 +59,7 @@ impl PcieCache {
         Self { vendors }
     }
 
+    #[tracing::instrument(skip(self))]
     pub fn find<'a>(&'a self, input: &'a str) -> Result<PcieDeviceInfo, NomError> {
         let parsed_identifier = parse_device_identifier(input)?;
         // search for a vendor
