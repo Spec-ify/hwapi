@@ -82,6 +82,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // initialize logging
     let cli_args = Args::parse();
     tracing_subscriber::fmt()
+        .json()
         .with_span_events(FmtSpan::CLOSE)
         .init();
     // log::set_logger(&LOGGER)

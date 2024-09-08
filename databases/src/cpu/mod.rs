@@ -162,6 +162,12 @@ impl CpuCache {
     }
 }
 
+impl Default for CpuCache {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Take the input model name, and try to parse it into an [IndexEntry]
 fn generate_index_entry(name: &str) -> Result<IndexEntry, Box<dyn std::error::Error + '_>> {
     let model_token = find_model(name);
