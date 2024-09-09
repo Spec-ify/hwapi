@@ -27,6 +27,7 @@ pub struct UsbResponse {
 
 /// This handler accepts a `GET` request to `/api/usbs/?identifier`.
 /// It relies on a globally shared [AppState] to re-use the usb cache.
+#[tracing::instrument(name="single_usb_handler", skip(state))]
 pub async fn get_usb_handler(
     State(state): State<AppState>,
     Query(query): Query<UsbQuery>,
@@ -59,6 +60,7 @@ pub struct PcieResponse {
 
 /// This handler accepts a `GET` request to `/api/pcie/?identifier`.
 /// It relies on a globally shared [AppState] to re-use the pcie cache
+#[tracing::instrument(name="single_pcie_handler", skip(state))]
 pub async fn get_pcie_handler(
     State(state): State<AppState>,
     Query(query): Query<GetPcieQuery>,
@@ -80,6 +82,7 @@ pub async fn get_pcie_handler(
 /// This handler accepts a `POST` request to `/api/pcie/`, with a body containing a serialized array of strings.
 /// It relies on a globally shared [AppState] to re-use the pcie cache, and is largely identical to [get_pcie_handler], but
 /// is intended for batching
+#[tracing::instrument(name="bulk_pcie_handler", skip(state))]
 pub async fn post_pcie_handler(
     State(state): State<AppState>,
     Json(query): Json<Vec<String>>,
@@ -104,6 +107,7 @@ pub async fn post_pcie_handler(
 /// This handler accepts a `POST` request to `/api/usbs/`, with a body containing a serialized array of usb device identifier strings.
 /// It relies on a globally shared [AppState] to re-use the pcie cache, and is largely identical to [get_usb_handler], but
 /// is intended for batching
+#[tracing::instrument(name="bulk_usb_handler", skip(state))]
 pub async fn post_usbs_handler(
     State(state): State<AppState>,
     Json(query): Json<Vec<String>>,
@@ -132,6 +136,7 @@ pub struct CpuQuery {
 /// This handler accepts a `GET` request to `/api/cpus/?name=[CPU_NAME]`.
 /// It relies on a globally shared [AppState] to re-use the cpu cache, and responds to the request with a serialized [Cpu].
 /// It will always attempt to find a cpu, and should always return a cpu. The correctness of the return value is not guaranteed.
+#[tracing::instrument(name="cpu_handler", skip(state))]
 pub async fn get_cpu_handler(
     State(mut state): State<AppState>,
     Query(query): Query<CpuQuery>,

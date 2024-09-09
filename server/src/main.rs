@@ -11,54 +11,17 @@ use databases::cpu::CpuCache;
 use databases::pcie::PcieCache;
 use databases::usb::UsbCache;
 use handlers::*;
+use opentelemetry_otlp::WithExportConfig;
+use opentelemetry::trace::TracerProvider as _;
+use opentelemetry_sdk::trace::TracerProvider;
 use std::env;
 use tower_http::cors::CorsLayer;
 use tower_http::trace::TraceLayer;
 use tracing::{info, info_span, Level};
-use tracing_subscriber::fmt::format::FmtSpan;
-
-// /// Because the error that nom uses is rather lengthy and unintuitive, it's defined here
-// /// to simplify handling
-// // pub type NomError<'a> = nom::Err<nom::error::Error<&'a str>>;
-// /// https://docs.rs/log/latest/log/#implementing-a-logger
-// struct SimpleLogger;
-
-// impl log::Log for SimpleLogger {
-//     fn enabled(&self, _: &Metadata) -> bool {
-//         // this is configured by calling log::set_max_level, and so this logging implementation logs all kinds of levels
-//         true
-//     }
-
-//     fn log(&self, record: &Record) {
-//         if self.enabled(record.metadata()) {
-//             let level = match record.level() {
-//                 Level::Info => format!("{}", record.level()).bold().blue(),
-//                 Level::Warn => format!("{}", record.level()).bold().yellow(),
-//                 Level::Error => format!("{}", record.level()).bold().red(),
-//                 Level::Debug => format!("{}", record.level()).bold().green(),
-//                 Level::Trace => format!("{}", record.level()).bold().cyan(),
-//             };
-//             println!(
-//                 "({})[{}] {}",
-//                 Local::now().to_rfc2822(),
-//                 level,
-//                 record.args()
-//             );
-//         }
-//     }
-
-//     fn flush(&self) {}
-// }
-
-// #[derive(ValueEnum, Clone)]
-// enum LoggingLevel {
-//     Silent,
-//     Error,
-//     Warning,
-//     Info,
-//     Debug,
-//     Trace,
-// }
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::util::SubscriberInitExt;
+use opentelemetry::KeyValue;
+use opentelemetry_sdk::Resource;
 
 #[derive(Parser)]
 struct Args {
@@ -75,19 +38,21 @@ struct Args {
     logging_level: Level,
 }
 
-// static LOGGER: SimpleLogger = SimpleLogger;
-
 #[tokio::main(flavor = "multi_thread", worker_threads = 10)]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // initialize logging
     let cli_args = Args::parse();
-    tracing_subscriber::fmt()
-        .json()
-        .with_span_events(FmtSpan::CLOSE)
-        .init();
-    // log::set_logger(&LOGGER)
-    //     .map(|()| log::set_max_level(cli_args.logging_level))
-    //     .unwrap();
+    let fmt_layer = tracing_subscriber::fmt::layer();
+    let otel_exporter = opentelemetry_otlp::new_exporter().http().with_protocol(opentelemetry_otlp::Protocol::HttpJson).with_endpoint("https://oltp.spec-ify.com/v1/traces");
+    let provider = TracerProvider::builder().with_batch_exporter(otel_exporter.build_span_exporter()?, opentelemetry_sdk::runtime::Tokio).with_config(
+        opentelemetry_sdk::trace::Config::default().with_resource(Resource::new(vec![KeyValue::new(
+            "service.name",
+            "hwapi",
+        )])),
+    ).build();
+    let tracer = provider.tracer("hwapi");
+    let layer = tracing_opentelemetry::layer().with_tracer(tracer);
+    tracing_subscriber::registry().with(fmt_layer).with(layer).init();
     info!("Application started");
     // parse command line arguments
     // create a new http router and register respective routes and handlers
