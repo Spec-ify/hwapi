@@ -747,7 +747,7 @@ dependencies = [
  "clap",
  "databases",
  "handlers",
- "opentelemetry 0.24.0",
+ "opentelemetry 0.25.0",
  "opentelemetry-appender-tracing",
  "opentelemetry-otlp",
  "opentelemetry_sdk",
