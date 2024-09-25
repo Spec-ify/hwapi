@@ -89,7 +89,7 @@ impl CpuCache {
     /// and return the entry with a `name` of "AMD Ryzen™ 5 3600".
     ///
     /// A mutable reference is required so that the comparison cache can be shared between calls
-    #[tracing::instrument(name="cpu_lookup", skip(self))]
+    #[tracing::instrument(name = "cpu_lookup", skip(self))]
     pub fn find<'a>(
         &'a mut self,
         input: &'a str,

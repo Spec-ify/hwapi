@@ -48,7 +48,7 @@ impl UsbCache {
     ///
     /// TODO: this function calls unwrap on a very fallible function, change function
     /// to return a Result, you could then make it so that vendor and device aren't options
-    #[tracing::instrument(name="usb_lookup", skip(self))]
+    #[tracing::instrument(name = "usb_lookup", skip(self))]
     pub fn find<'a>(
         &'a self,
         input: &'a str,
