@@ -2,6 +2,7 @@
 use axum::extract::Query;
 use axum::http::StatusCode;
 use axum::{extract::State, Json};
+use databases::bugcheck::BugCheckCache;
 use databases::cpu::Cpu;
 use databases::{cpu::CpuCache, pcie::PcieCache, usb::UsbCache};
 use serde::{Deserialize, Serialize};
@@ -12,6 +13,7 @@ pub struct AppState {
     pub cpu_cache: CpuCache,
     pub usb_cache: UsbCache,
     pub pcie_cache: PcieCache,
+    pub bugcheck_cache: BugCheckCache,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -155,4 +157,55 @@ pub async fn get_cpu_handler(
             Err(StatusCode::NOT_FOUND)
         }
     }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct GetBugCheckQuery {
+    code: u64,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct BugCheckResponse {
+    code: u64,
+    name: String,
+    url: String,
+}
+/// This handler accepts a `GET` request to `/api/bugcheck/?code=[CODE]`
+pub async fn get_bugcheck_handler(
+    State(state): State<AppState>,
+    Query(query): Query<GetBugCheckQuery>,
+) -> Result<Json<BugCheckResponse>, StatusCode> {
+    if let Some((name, url)) = state.bugcheck_cache.get(query.code) {
+        Ok(Json(BugCheckResponse {
+            code: query.code,
+            name: name.to_string(),
+            url: url.to_string(),
+        }))
+    } else {
+        Err(StatusCode::NOT_FOUND)
+    }
+}
+
+/// This handler accepts a `POST` request to `/api/bugcheck/`, with a body containing a serialized array of bugcheck code numbers.
+/// Any unknown bugcheck codes will be substituted with `null`
+#[tracing::instrument(name = "bulk_bugcheck_handler", skip(state))]
+pub async fn post_bugcheck_handler(
+    State(state): State<AppState>,
+    Json(query): Json<Vec<u64>>,
+) -> Result<Json<Vec<Option<BugCheckResponse>>>, StatusCode> {
+    let mut response: Vec<Option<BugCheckResponse>> = Vec::with_capacity(16);
+    for entry in query {
+        if let Some((name, url)) = state.bugcheck_cache.get(entry) {
+            response.push({
+                Some(BugCheckResponse {
+                    code: entry,
+                    name: name.to_string(),
+                    url: url.to_string(),
+                })
+            });
+        } else {
+            response.push(None);
+        }
+    }
+    Ok(Json(response))
 }

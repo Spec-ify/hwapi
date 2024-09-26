@@ -7,6 +7,7 @@ use axum::routing::post;
 use axum::{routing::get, Router};
 use clap::builder::TypedValueParser;
 use clap::Parser;
+use databases::bugcheck::BugCheckCache;
 use databases::cpu::CpuCache;
 use databases::pcie::PcieCache;
 use databases::usb::UsbCache;
@@ -53,17 +54,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             opentelemetry_sdk::runtime::Tokio,
         )
         .with_config(
-            opentelemetry_sdk::trace::Config::default().with_resource(Resource::new(vec![
-                KeyValue::new("service.name", "hwapi"),
-            ])),
+            opentelemetry_sdk::trace::Config::default()
+                .with_resource(Resource::new(vec![KeyValue::new("service.name", "hwapi")])),
         )
         .build();
     let tracer = provider.tracer("hwapi");
-    let layer = tracing_opentelemetry::layer().with_tracer(tracer);
-    tracing_subscriber::registry()
-        .with(fmt_layer)
-        .with(layer)
-        .init();
+    let otel_layer: tracing_opentelemetry::OpenTelemetryLayer<tracing_subscriber::layer::Layered<tracing_subscriber::fmt::Layer<tracing_subscriber::Registry>, tracing_subscriber::Registry>, opentelemetry_sdk::trace::Tracer> = tracing_opentelemetry::layer().with_tracer(tracer);
+    let registry = tracing_subscriber::registry()
+        .with(fmt_layer);
+        if cfg!(debug_assertions) {
+            registry.init();
+        } else {
+            registry.with(otel_layer).init();
+        }
     info!("Application started");
     // parse command line arguments
     // create a new http router and register respective routes and handlers
@@ -74,6 +77,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/api/usbs/", post(post_usbs_handler))
         .route("/api/pcie/", get(get_pcie_handler))
         .route("/api/pcie/", post(post_pcie_handler))
+        .route("/api/bugcheck/", get(get_bugcheck_handler))
+        .route("/api/bugcheck/", post(post_bugcheck_handler))
         .layer(
             CorsLayer::new()
                 .allow_methods([Method::GET, Method::POST])
@@ -100,6 +105,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             cpu_cache: CpuCache::new(),
             usb_cache: UsbCache::new(),
             pcie_cache: PcieCache::new(),
+            bugcheck_cache: BugCheckCache::new(),
         });
 
     let mut port: String = cli_args.port;

@@ -5,6 +5,7 @@ Current information fetched includes:
 - CPU info (Intel ARK, AMD Product Database)
 - USB info (VID/PID mapping)
 - PCIe info (VID/PID/SUBSYS mapping)
+- Windows BugCheck error codes
 
 ## Project layout
 The code is organized into 4 separate crates:
@@ -157,5 +158,52 @@ And here's example response (truncated):
       "device":"Matisse/Vermeer Data Fabric: Device 18h; Function 4",
       "subsystem":null
    },
+]
+```
+
+### BugCheck
+To interact with the bugcheck API, submit a `GET` request to `/api/bugcheck/?code=[BUGCHECK_CODE]`, where `[BUGCHECK_CODE]` is an integer value of a valid bugcheck code.
+
+The endpoint will return a structure that looks like this:
+```json
+{
+    "code": "number",
+    "name": "string",
+    "url": "string",
+}
+```
+
+Responses:<br>
+| Code | Meaning |
+| -- | -- |
+| `404` | No bugcheck is associated with that code|
+
+
+Here's an example curl request:
+```
+curl http://127.0.0.1:3000/api/bugcheck/?code=1
+```
+
+For bulk processing, you may submit a `POST` request to the same endpoint with a `Content-Type` of `application/json` and a payload containing an array of bugcheck codes (as numbers).
+
+The endpoint will return an array of objects (same shape as the `GET` request), or if an identifier string was unable to be processed successfully, `null` will substitute in the response.
+
+Here's an example curl request:
+```
+curl -X POST http://127.0.0.1:3000/api/bugcheck/ -H "Content-Type: application/json" -d '[1, 2, 3, 4, 5]'
+```
+
+And here's an example response (truncated):
+```json
+[
+   {
+      "vendor":"SteelSeries ApS",
+      "device":null
+   },
+   {
+      "vendor":"Dell Computer Corp.",
+      "device":"Model L100 Keyboard"
+   },
+   null
 ]
 ```
