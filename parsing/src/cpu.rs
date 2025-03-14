@@ -101,7 +101,7 @@ impl IntermediateCpuCache<'_> {
     pub fn find<'a>(
         &'a mut self,
         input: &'a str,
-    ) -> Result<Cpu<String>, Box<dyn std::error::Error + '_>> {
+    ) -> Result<Cpu<String>, Box<dyn std::error::Error + 'a>> {
         let index = if input.contains("AMD") {
             &self.amd_index
         } else {

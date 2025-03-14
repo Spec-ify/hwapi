@@ -9,6 +9,7 @@ type NomError<'a> = nom::Err<nom::error::Error<&'a str>>;
 
 /// Everything deserialized by the lexer
 #[derive(Debug)]
+#[allow(unused)]
 pub struct LexerOutput<'a> {
     /// The timestamp of the csv file
     pub timestamp: &'a str,
@@ -18,7 +19,7 @@ pub struct LexerOutput<'a> {
     pub records: Vec<Vec<&'a str>>,
 }
 
-pub fn lex_csv<'a>(input: &'a str) -> Result<LexerOutput, Box<dyn Error + 'a>> {
+pub fn lex_csv<'a>(input: &'a str) -> Result<LexerOutput<'a>, Box<dyn Error + 'a>> {
     let header_combinator_output = read_file_header(input).expect("Failed to read file header");
     let cpu_combinator_output =
         read_cpu_record(header_combinator_output.0).expect("Failed to parse list of cpus");

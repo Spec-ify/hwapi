@@ -2,11 +2,11 @@
 //! interfaces provided by the `database` crate, which rely on data parsed by the `parsing` crate.
 
 use axum::extract::{MatchedPath, Request};
-use axum::http::{header, HeaderValue, Method};
+use axum::http::{HeaderValue, Method, header};
 use axum::routing::post;
-use axum::{routing::get, Router};
-use clap::builder::TypedValueParser;
+use axum::{Router, routing::get};
 use clap::Parser;
+use clap::builder::TypedValueParser;
 use databases::bugcheck::BugCheckCache;
 use databases::cpu::CpuCache;
 use databases::pcie::PcieCache;
@@ -14,12 +14,12 @@ use databases::usb::UsbCache;
 use handlers::*;
 use opentelemetry::trace::TracerProvider as _;
 use opentelemetry_otlp::WithExportConfig;
-use opentelemetry_sdk::trace::SdkTracerProvider;
 use opentelemetry_sdk::Resource;
+use opentelemetry_sdk::trace::SdkTracerProvider;
 use std::env;
 use tower_http::cors::CorsLayer;
 use tower_http::trace::TraceLayer;
-use tracing::{info, info_span, Level};
+use tracing::{Level, info, info_span};
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 
@@ -46,22 +46,26 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let otel_exporter = opentelemetry_otlp::SpanExporter::builder()
         .with_http()
         .with_protocol(opentelemetry_otlp::Protocol::HttpJson)
-        .with_endpoint("https://oltp.spec-ify.com/v1/traces").build()?;
+        .with_endpoint("https://oltp.spec-ify.com/v1/traces")
+        .build()?;
     let provider = SdkTracerProvider::builder()
-        .with_batch_exporter(
-            otel_exporter,
-        )
+        .with_batch_exporter(otel_exporter)
         .with_resource(Resource::builder().with_service_name("hwapi").build())
         .build();
     let tracer = provider.tracer("hwapi");
-    let otel_layer: tracing_opentelemetry::OpenTelemetryLayer<tracing_subscriber::layer::Layered<tracing_subscriber::fmt::Layer<tracing_subscriber::Registry>, tracing_subscriber::Registry>, opentelemetry_sdk::trace::Tracer> = tracing_opentelemetry::layer().with_tracer(tracer);
-    let registry = tracing_subscriber::registry()
-        .with(fmt_layer);
-        if cfg!(debug_assertions) {
-            registry.init();
-        } else {
-            registry.with(otel_layer).init();
-        }
+    let otel_layer: tracing_opentelemetry::OpenTelemetryLayer<
+        tracing_subscriber::layer::Layered<
+            tracing_subscriber::fmt::Layer<tracing_subscriber::Registry>,
+            tracing_subscriber::Registry,
+        >,
+        opentelemetry_sdk::trace::Tracer,
+    > = tracing_opentelemetry::layer().with_tracer(tracer);
+    let registry = tracing_subscriber::registry().with(fmt_layer);
+    if cfg!(debug_assertions) {
+        registry.init();
+    } else {
+        registry.with(otel_layer).init();
+    }
     info!("Application started");
     // parse command line arguments
     // create a new http router and register respective routes and handlers
