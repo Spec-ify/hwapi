@@ -13,9 +13,8 @@ use databases::pcie::PcieCache;
 use databases::usb::UsbCache;
 use handlers::*;
 use opentelemetry::trace::TracerProvider as _;
-use opentelemetry::KeyValue;
 use opentelemetry_otlp::WithExportConfig;
-use opentelemetry_sdk::trace::TracerProvider;
+use opentelemetry_sdk::trace::SdkTracerProvider;
 use opentelemetry_sdk::Resource;
 use std::env;
 use tower_http::cors::CorsLayer;
@@ -48,12 +47,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_http()
         .with_protocol(opentelemetry_otlp::Protocol::HttpJson)
         .with_endpoint("https://oltp.spec-ify.com/v1/traces").build()?;
-    let provider = TracerProvider::builder()
+    let provider = SdkTracerProvider::builder()
         .with_batch_exporter(
             otel_exporter,
-            opentelemetry_sdk::runtime::Tokio,
         )
-        .with_resource(Resource::new(vec![KeyValue::new("service.name", "hwapi")]))
+        .with_resource(Resource::builder().with_service_name("hwapi").build())
         .build();
     let tracer = provider.tracer("hwapi");
     let otel_layer: tracing_opentelemetry::OpenTelemetryLayer<tracing_subscriber::layer::Layered<tracing_subscriber::fmt::Layer<tracing_subscriber::Registry>, tracing_subscriber::Registry>, opentelemetry_sdk::trace::Tracer> = tracing_opentelemetry::layer().with_tracer(tracer);
