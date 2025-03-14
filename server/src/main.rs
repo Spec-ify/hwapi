@@ -44,19 +44,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // initialize logging
     let cli_args = Args::parse();
     let fmt_layer = tracing_subscriber::fmt::layer();
-    let otel_exporter = opentelemetry_otlp::new_exporter()
-        .http()
+    let otel_exporter = opentelemetry_otlp::SpanExporter::builder()
+        .with_http()
         .with_protocol(opentelemetry_otlp::Protocol::HttpJson)
-        .with_endpoint("https://oltp.spec-ify.com/v1/traces");
+        .with_endpoint("https://oltp.spec-ify.com/v1/traces").build()?;
     let provider = TracerProvider::builder()
         .with_batch_exporter(
-            otel_exporter.build_span_exporter()?,
+            otel_exporter,
             opentelemetry_sdk::runtime::Tokio,
         )
-        .with_config(
-            opentelemetry_sdk::trace::Config::default()
-                .with_resource(Resource::new(vec![KeyValue::new("service.name", "hwapi")])),
-        )
+        .with_resource(Resource::new(vec![KeyValue::new("service.name", "hwapi")]))
         .build();
     let tracer = provider.tracer("hwapi");
     let otel_layer: tracing_opentelemetry::OpenTelemetryLayer<tracing_subscriber::layer::Layered<tracing_subscriber::fmt::Layer<tracing_subscriber::Registry>, tracing_subscriber::Registry>, opentelemetry_sdk::trace::Tracer> = tracing_opentelemetry::layer().with_tracer(tracer);
