@@ -9,5 +9,5 @@ databases = { path = "../databases" }
 parsing = { path = "../parsing" }
 axum = "0.8.1"
 serde = { version = "1.0.210", features = ["derive"] }
-tower-http = { version = "0.6.0", features = ["cors"] }
+tower-http = { version = "0.6.2", features = ["cors"] }
 tracing = "0.1.41"
