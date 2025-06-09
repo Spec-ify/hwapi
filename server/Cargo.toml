@@ -21,4 +21,4 @@ opentelemetry = "0.28.0"
 opentelemetry_sdk = { version = "0.28.0", features = ["rt-tokio"] }
 opentelemetry-otlp = { version = "0.28.0", features = ["http-json", "reqwest", "reqwest-client"] }
 reqwest = { version = "0.12.9", features = ["multipart"] }
-tracing-opentelemetry = "0.29.0"
+tracing-opentelemetry = "0.31.0"
