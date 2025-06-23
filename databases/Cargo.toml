@@ -11,7 +11,7 @@ phf_codegen = "0.11.3"
 parsing = { path = "../parsing" }
 chrono = "0.4.40"
 nom = "7.1.3"
-serde = { version = "1.0.210", features = ["derive"] }
+serde = { version = "1.0.219", features = ["derive"] }
 phf = { version = "0.11.3", features = ["macros"] }
 tracing = "0.1.41"
 
