@@ -80,7 +80,7 @@ impl Default for UsbCache {
 /// Input strings in the form of `USB\VID_1234&PID_5678\9479493` are assumed.
 /// It returns a tuple, where the first value is the vendor id, and the second is the product id. This tuple contains substrings of the initial input string,
 /// so handle lifetimes accordingly.
-fn parse_device_identifier(device_string: &str) -> Result<(u16, u16), NomError> {
+fn parse_device_identifier(device_string: &str) -> Result<(u16, u16), NomError<'_>> {
     // https://learn.microsoft.com/en-us/windows-hardware/drivers/install/standard-usb-identifiers
     // TODO: this does not fully support all formats of usb device identifiers
     let vid_combinator = delimited(tag("USB\\VID_"), take(4_u8), take(1_u8))(device_string)?;

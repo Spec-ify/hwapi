@@ -148,14 +148,14 @@ impl IntermediateCpuCache<'_> {
                 }
                 // intel requires some work to un-zerocopy data
                 let found_cpu = &self.intel_cpus[idx_entry.index];
-                return Ok(Cpu {
+                Ok(Cpu {
                     name: found_cpu.name.to_string(),
                     attributes: found_cpu
                         .attributes
                         .iter()
                         .map(|(k, v)| (k.to_string(), v.to_string()))
                         .collect(),
-                });
+                })
             }
         }
     }
