@@ -1184,7 +1184,6 @@ dependencies = [
  "reqwest",
  "serde_json",
  "thiserror",
- "tracing",
 ]
 
 [[package]]
