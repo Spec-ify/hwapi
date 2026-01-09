@@ -42,7 +42,7 @@ fn process_json(json: AmdJson) -> Vec<Cpu<String>> {
         };
         for key in raw_data.keys() {
             // stripping out keys that are either garbage, or already handled (model)
-            let blacklist = ["0", "", "Model"];
+            let blacklist = ["0", "", "Name"];
             if blacklist.contains(&key.as_str()) {
                 continue;
             }
