@@ -1,0 +1,159 @@
+﻿ARK | Intel® Product Specification Comparison
+01/10/2026 12:05:48 AM
+ ,Intel® Xeon® 6718P-B Processor ,Intel® Xeon® 6518P-B Processor ,Intel® Core™ Ultra 7 Processor 365 ,Intel® Core™ Ultra 5 Processor 322 ,Intel® Core™ Ultra 5 Processor 332 ,Intel® Core™ Ultra 5 Processor 325 ,Intel® Core™ Ultra 7 Processor 355 ,Intel® Core™ Ultra 5 Processor 335 ,Intel® Xeon® 6768P-B Processor ,Intel® Xeon® 6718P-B Processor ,Intel® Xeon® 6518P-B Processor ,Intel® Core™ Ultra 7 Processor 365 ,Intel® Core™ Ultra 5 Processor 322 ,Intel® Core™ Ultra 5 Processor 332 ,Intel® Core™ Ultra 5 Processor 325 ,Intel® Core™ Ultra 7 Processor 355 ,Intel® Core™ Ultra 5 Processor 335 ,Intel® Xeon® 6768P-B Processor 
+Essentials
+Product Collection,Intel® Xeon® 6 processors,Intel® Xeon® 6 processors,Intel® Core™ Ultra Series 3 processors,Intel® Core™ Ultra Series 3 processors,Intel® Core™ Ultra Series 3 processors,Intel® Core™ Ultra Series 3 processors,Intel® Core™ Ultra Series 3 processors,Intel® Core™ Ultra Series 3 processors,Intel® Xeon® 6 processors,Intel® Xeon® 6 processors,Intel® Xeon® 6 processors,Intel® Core™ Ultra Series 3 processors,Intel® Core™ Ultra Series 3 processors,Intel® Core™ Ultra Series 3 processors,Intel® Core™ Ultra Series 3 processors,Intel® Core™ Ultra Series 3 processors,Intel® Core™ Ultra Series 3 processors,Intel® Xeon® 6 processors
+Vertical Segment,Server,Server,Mobile,Mobile,Mobile,Mobile,Mobile,Mobile,Server,Server,Server,Mobile,Mobile,Mobile,Mobile,Mobile,Mobile,Server
+Processor Number,6718P-B,6518P-B,365,322,332,325,355,335,6768P-B,6718P-B,6518P-B,365,322,332,325,355,335,6768P-B
+Lithography,Intel 3,Intel 3,,,,,,,Intel 3,Intel 3,Intel 3,,,,,,,Intel 3
+Recommended Customer Price,,,$1689.00-$1699.00,$739.00,,,$609.00,$325.00,$1339.00-$1349.00,$117.00,,$47.00,$341.00,$331.00,,$127.00,$39.00,$42.00,,$426.00,$392.00,$392.00,$459.00,,$228.00,$557.00,$228.00,$430.00,$277.00,$279.00,$399.00,$309.00,$107.00,,$457.00,$285.00,$285.00,$311.00,$107.00,$426.00,$3949.00,$239.00,$239.00,$557.00,,$325.00,,$341.00,$331.00,,,,$3297.00,$459.00,$447.00,,,$279.00,,,$457.00,$311.00,$1689.00-$1699.00,$3949.00,,$8513.00,,$2689.00-$2699.00,$7692.00,$3297.00,$4447.00,,,$1689.00-$1699.00,$3789.00-$3799.00,$1339.00,$2339.00,$2689.00-$2699.00,$2039.00,$3789.00-$3799.00,$9625.00,$9625.00,$12460.00,$12460.00,,$10220.00,,,,,,,,,,$549.00,$589.00-$599.00,$549.00-$579.00,$379.00-$389.00,$394.00-$404.00,$369.00-$379.00,$384.00,$294.00-$304.00,$309.00-$319.00,$384.00-$394.00,$221.00-$231.00,$236.00-$246.00,$319.00,$213.00,$281.00,$556.00,$426.00,$506.00,$375.00,$606.00,,,,,$9115.00,,,,,$247.00-$257.00,,,,,,$6497.00,$4421.00,$3726.00,$8960.00,$7803.00,$19000.00,$4650.00,$16000.00,$6570.00,$10400.00,$9595.00,,,,,$236.00,$247.00,$270.00,$270.00,,,,,,,,$4995.00,$6540.00,$1250.00,$2700.00,$2234.00,$12702.00,$3351.00,$1295.00,$5295.00,$2878.00,$2478.00,$1195.00,$815.00,$563.00,$765.00,$740.00,$3622.00,$2816.00,$221.00,$232.00,$232.00,$134.00,$384.00,$221.00,$384.00,$134.00,$6850.00,$3795.00,$934.00,$1544.00,$1795.00,$1450.00,$2368.00,$2206.00,$2402.00,$3200.00,$2616.00,$2628.00,$3200.00,$1399.00,$5250.00,$9875.00,$6760.00,$269.00,$269.00,,,$9925.00,$11025.00,$150.00,$75.00,,$3845.00,$5040.00,$4200.00,$3990.00,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Recommended Customer Price,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+
+CPU Specifications
+Total Cores,40,20,8,6,6,8,8,8,64,40,20,8,6,6,8,8,8,64
+# of Performance-cores,40,20,4,2,2,4,4,4,64,40,20,4,2,2,4,4,4,64
+Total Threads,80,40,8,6,6,8,8,8,128,80,40,8,6,6,8,8,8,128
+Max Turbo Frequency,3.5 GHz,3.5 GHz,4.8 GHz,4.4 GHz,4.4 GHz,4.5 GHz,4.7 GHz,4.6 GHz,3.5 GHz,3.5 GHz,3.5 GHz,4.8 GHz,4.4 GHz,4.4 GHz,4.5 GHz,4.7 GHz,4.6 GHz,3.5 GHz
+Processor Base Frequency,2.5 GHz,2 GHz,,,,,,,2.2 GHz,2.5 GHz,2 GHz,,,,,,,2.2 GHz
+Cache,160 MB,80 MB,12 MB Intel® Smart Cache,12 MB Intel® Smart Cache,12 MB Intel® Smart Cache,12 MB Intel® Smart Cache,12 MB Intel® Smart Cache,12 MB Intel® Smart Cache,256 MB,160 MB,80 MB,12 MB Intel® Smart Cache,12 MB Intel® Smart Cache,12 MB Intel® Smart Cache,12 MB Intel® Smart Cache,12 MB Intel® Smart Cache,12 MB Intel® Smart Cache,256 MB
+Max # of UPI Links,0,0,,,,,,,0,0,0,,,,,,,0
+Bus Speed,0.000 GT/s,0.000 GT/s,,,,,,,0.000 GT/s,0.000 GT/s,0.000 GT/s,,,,,,,0.000 GT/s
+TDP,235 W,150 W,,,,,,,325 W,235 W,150 W,,,,,,,325 W
+Intel® Deep Learning Boost (Intel® DL Boost) on CPU,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+# of Efficiency-cores,,,0,0,0,0,0,0,,,,0,0,0,0,0,0,
+# of Low Power Efficient-cores,,,4,4,4,4,4,4,,,,4,4,4,4,4,4,
+Intel® Turbo Boost Max Technology 3.0 Frequency ‡,,,4.8 GHz,4.4 GHz,4.4 GHz,4.5 GHz,4.7 GHz,4.6 GHz,,,,4.8 GHz,4.4 GHz,4.4 GHz,4.5 GHz,4.7 GHz,4.6 GHz,
+Single P-core Turbo Frequency,,,4.8 GHz,4.4 GHz,4.4 GHz,4.5 GHz,4.7 GHz,4.6 GHz,,,,4.8 GHz,4.4 GHz,4.4 GHz,4.5 GHz,4.7 GHz,4.6 GHz,
+Low Power Efficient-core Max Turbo Frequency,,,3.6 GHz,3.3 GHz,3.3 GHz,3.4 GHz,3.5 GHz,3.4 GHz,,,,3.6 GHz,3.3 GHz,3.3 GHz,3.4 GHz,3.5 GHz,3.4 GHz,
+P-core Base Frequency,,,2.4 GHz,2.5 GHz,2.5 GHz,2.1 GHz,2.3 GHz,2.2 GHz,,,,2.4 GHz,2.5 GHz,2.5 GHz,2.1 GHz,2.3 GHz,2.2 GHz,
+E-core Base Frequency,,,1.8 GHz,1.9 GHz,1.9 GHz,1.6 GHz,1.7 GHz,1.6 GHz,,,,1.8 GHz,1.9 GHz,1.9 GHz,1.6 GHz,1.7 GHz,1.6 GHz,
+Low Power Efficient-core Base Frequency,,,1.8 GHz,1.9 GHz,1.9 GHz,1.6 GHz,1.7 GHz,1.6 GHz,,,,1.8 GHz,1.9 GHz,1.9 GHz,1.6 GHz,1.7 GHz,1.6 GHz,
+Processor Base Power,,,25 W,25 W,25 W,25 W,25 W,25 W,,,,25 W,25 W,25 W,25 W,25 W,25 W,
+Maximum Turbo Power,,,55 W,55 W,55 W,55 W,55 W,55 W,,,,55 W,55 W,55 W,55 W,55 W,55 W,
+Minimum Assured Power,,,12 W,12 W,12 W,12 W,12 W,12 W,,,,12 W,12 W,12 W,12 W,12 W,12 W,
+AI Software Frameworks Supported by CPU,,,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebNN,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebNN,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebNN,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebNN,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebNN,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebNN,,,,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebNN,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebNN,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebNN,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebNN,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebNN,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebNN,
+CPU Lithography,,,Intel 18A,Intel 18A,Intel 18A,Intel 18A,Intel 18A,Intel 18A,,,,Intel 18A,Intel 18A,Intel 18A,Intel 18A,Intel 18A,Intel 18A,
+All Core Turbo Frequency,,,,,,,,,3.3 GHz,,,,,,,,,3.3 GHz
+
+Supplemental Information
+Marketing Status,Launched,Launched,Launched,Launched,Launched,Launched,Launched,Launched,Launched,Launched,Launched,Launched,Launched,Launched,Launched,Launched,Launched,Launched
+Launch Date,Q4'25,Q4'25,Q1'26,Q1'26,Q1'26,Q1'26,Q1'26,Q1'26,Q4'25,Q4'25,Q4'25,Q1'26,Q1'26,Q1'26,Q1'26,Q1'26,Q1'26,Q4'25
+Servicing Status,Baseline Servicing,Baseline Servicing,,,,,,,Baseline Servicing,Baseline Servicing,Baseline Servicing,,,,,,,Baseline Servicing
+Embedded Options Available,Yes,Yes,No,No,No,No,No,No,Yes,Yes,Yes,No,No,No,No,No,No,Yes
+Use Conditions,Communications Commercial Temp,Communications Extended Temp,,,,,,,Communications Commercial Temp,Communications Commercial Temp,Communications Extended Temp,,,,,,,Communications Commercial Temp
+Description,,,Intel® Core™ Ultra Series 3 processors are suitable for use in select desktop form factors,Intel® Core™ Ultra Series 3 processors are suitable for use in select desktop form factors,Intel® Core™ Ultra Series 3 processors are suitable for use in select desktop form factors,Intel® Core™ Ultra Series 3 processors are suitable for use in select desktop form factors,Intel® Core™ Ultra Series 3 processors are suitable for use in select desktop form factors,Intel® Core™ Ultra Series 3 processors are suitable for use in select desktop form factors,,,,Intel® Core™ Ultra Series 3 processors are suitable for use in select desktop form factors,Intel® Core™ Ultra Series 3 processors are suitable for use in select desktop form factors,Intel® Core™ Ultra Series 3 processors are suitable for use in select desktop form factors,Intel® Core™ Ultra Series 3 processors are suitable for use in select desktop form factors,Intel® Core™ Ultra Series 3 processors are suitable for use in select desktop form factors,Intel® Core™ Ultra Series 3 processors are suitable for use in select desktop form factors,
+
+Memory Specifications
+Max Memory Size (dependent on memory type),1.13 TB,1.13 TB,128 GB,128 GB,128 GB,128 GB,128 GB,128 GB,2.25 TB,1.13 TB,1.13 TB,128 GB,128 GB,128 GB,128 GB,128 GB,128 GB,2.25 TB
+Memory Types,DDR5,DDR5,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,DDR5,DDR5,DDR5,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,DDR5
+Maximum Memory Speed,6400 MT/s,4800 MT/s,,,,,,,6400 MHz,6400 MT/s,4800 MT/s,,,,,,,6400 MHz
+Max # of Memory Channels,4,4,2,2,2,2,2,2,8,4,4,2,2,2,2,2,2,8
+Intel® Optane™ Persistent Memory Supported,No,No,,,,,,,No,No,No,,,,,,,No
+ECC Memory Supported   ‡,Yes,Yes,,,,,,,Yes,Yes,Yes,,,,,,,Yes
+
+Expansion Options
+Scalability,1S Only,1S Only,,,,,,,1S Only,1S Only,1S Only,,,,,,,1S Only
+PCI Express Revision,Gen 4 |  Gen 5,Gen 4 |  Gen 5,5.0 and 4.0,5.0 and 4.0,5.0 and 4.0,5.0 and 4.0,5.0 and 4.0,5.0 and 4.0,Gen4 |  Gen5,Gen 4 |  Gen 5,Gen 4 |  Gen 5,5.0 and 4.0,5.0 and 4.0,5.0 and 4.0,5.0 and 4.0,5.0 and 4.0,5.0 and 4.0,Gen4 |  Gen5
+PCI Express Configurations ‡,32 Lanes Gen 5; 16 Lanes Gen 4,32 Lanes Gen 5; 16 Lanes Gen 4,x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),32 Lanes Gen 5; 16 Lanes Gen 4,32 Lanes Gen 5; 16 Lanes Gen 4,32 Lanes Gen 5; 16 Lanes Gen 4,x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),32 Lanes Gen 5; 16 Lanes Gen 4
+Max # of PCI Express Lanes,48,48,12,12,12,12,12,12,48,48,48,12,12,12,12,12,12,48
+Intel® Thunderbolt™ 4,,,Yes,Yes,Yes,Yes,Yes,Yes,,,,Yes,Yes,Yes,Yes,Yes,Yes,
+
+I/O Specifications
+Integrated LAN,Yes,Yes,,,,,,,Yes,Yes,Yes,,,,,,,Yes
+
+Package Specifications
+TCASE,85,85,,,,,,,85,85,85,,,,,,,85
+Package Size,77.5mm x 50mm,77.5mm x 50mm,50mm x 25mm,50mm x 25mm,50mm x 25mm,50mm x 25mm,50mm x 25mm,50mm x 25mm,77.5 mm x 56.5 mm,77.5mm x 50mm,77.5mm x 50mm,50mm x 25mm,50mm x 25mm,50mm x 25mm,50mm x 25mm,50mm x 25mm,50mm x 25mm,77.5 mm x 56.5 mm
+Sockets Supported,,,FCBGA2540,FCBGA2540,FCBGA2540,FCBGA2540,FCBGA2540,FCBGA2540,FCBGA5026,,,FCBGA2540,FCBGA2540,FCBGA2540,FCBGA2540,FCBGA2540,FCBGA2540,FCBGA5026
+Operating Temperature (Maximum),,,100 °C,100 °C,100 °C,100 °C,100 °C,100 °C,,,,100 °C,100 °C,100 °C,100 °C,100 °C,100 °C,
+
+Advanced Technologies
+Intel® Media Transcode Accelerator,Yes,No,,,,,,,Yes,Yes,No,,,,,,,Yes
+Intel® vRAN Boost,Yes,Yes,,,,,,,Yes,Yes,Yes,,,,,,,Yes
+Intel® QuickAssist Technology (QAT),1 default devices,1 default devices,,,,,,,2 default devices,1 default devices,1 default devices,,,,,,,2 default devices
+Intel® Dynamic Load Balancer (DLB),1 default devices,1 default devices,,,,,,,1 default devices,1 default devices,1 default devices,,,,,,,1 default devices
+Intel® Data Streaming Accelerator (DSA),1 default devices,1 default devices,,,,,,,1 default devices,1 default devices,1 default devices,,,,,,,1 default devices
+Intel® In-memory Analytics Accelerator (IAA),0 default devices,0 default devices,,,,,,,0 default devices,0 default devices,0 default devices,,,,,,,0 default devices
+Intel® Advanced Matrix Extensions (AMX),Yes,Yes,,,,,,,Yes,Yes,Yes,,,,,,,Yes
+Intel® Speed Select Technology – Core Power,No,No,,,,,,,No,No,No,,,,,,,No
+Intel® Speed Select Technology – Turbo Frequency,No,No,,,,,,,No,No,No,,,,,,,No
+Intel® Speed Select Technology - Performance Profile,Yes,No,,,,,,,Yes,Yes,No,,,,,,,Yes
+Intel® Speed Select Technology - Base Frequency,No,No,,,,,,,No,No,No,,,,,,,No
+Intel® Resource Director Technology (Intel® RDT),Yes,Yes,,,,,,,Yes,Yes,Yes,,,,,,,Yes
+Intel® Optane™ Memory Supported ‡,No,No,,,,,,,No,No,No,,,,,,,No
+Intel® Turbo Boost Technology ‡,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0
+Intel® Hyper-Threading Technology ‡,Yes,Yes,,,,,,,Yes,Yes,Yes,,,,,,,Yes
+Intel® 64 ‡,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+Instruction Set,64-bit,64-bit,64-bit,64-bit,64-bit,64-bit,64-bit,64-bit,64-bit,64-bit,64-bit,64-bit,64-bit,64-bit,64-bit,64-bit,64-bit,64-bit
+Instruction Set Extensions,Intel® AMX |  Intel® SSE4.2 |  Intel® AVX |  Intel® AVX2 |  Intel® AVX-512,Intel® AMX |  Intel® SSE4.2 |  Intel® AVX |  Intel® AVX2 |  Intel® AVX-512,Intel® SSE4.1 |  Intel® SSE4.2 |  Intel® AVX2,Intel® SSE4.1 |  Intel® SSE4.2 |  Intel® AVX2,Intel® SSE4.1 |  Intel® SSE4.2 |  Intel® AVX2,Intel® SSE4.1 |  Intel® SSE4.2 |  Intel® AVX2,Intel® SSE4.1 |  Intel® SSE4.2 |  Intel® AVX2,Intel® SSE4.1 |  Intel® SSE4.2 |  Intel® AVX2,Intel® SSE4.2 |  Intel® AVX |  Intel® AVX2 |  Intel® AVX-512 |  Intel® AMX,Intel® AMX |  Intel® SSE4.2 |  Intel® AVX |  Intel® AVX2 |  Intel® AVX-512,Intel® AMX |  Intel® SSE4.2 |  Intel® AVX |  Intel® AVX2 |  Intel® AVX-512,Intel® SSE4.1 |  Intel® SSE4.2 |  Intel® AVX2,Intel® SSE4.1 |  Intel® SSE4.2 |  Intel® AVX2,Intel® SSE4.1 |  Intel® SSE4.2 |  Intel® AVX2,Intel® SSE4.1 |  Intel® SSE4.2 |  Intel® AVX2,Intel® SSE4.1 |  Intel® SSE4.2 |  Intel® AVX2,Intel® SSE4.1 |  Intel® SSE4.2 |  Intel® AVX2,Intel® SSE4.2 |  Intel® AVX |  Intel® AVX2 |  Intel® AVX-512 |  Intel® AMX
+# of AVX-512 FMA Units,2,2,,,,,,,2,2,2,,,,,,,2
+Integrated Intel® QuickAssist Technology,Yes,Yes,,,,,,,Yes,Yes,Yes,,,,,,,Yes
+Intel® Volume Management Device (VMD),Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+Intel® Thread Director,,,Yes,Yes,Yes,Yes,Yes,Yes,,,,Yes,Yes,Yes,Yes,Yes,Yes,
+Intel® Smart Sound Technology,,,Yes,Yes,Yes,Yes,Yes,Yes,,,,Yes,Yes,Yes,Yes,Yes,Yes,
+Intel® Wake on Voice,,,Yes,Yes,Yes,Yes,Yes,Yes,,,,Yes,Yes,Yes,Yes,Yes,Yes,
+Intel® High Definition Audio,,,Yes,Yes,Yes,Yes,Yes,Yes,,,,Yes,Yes,Yes,Yes,Yes,Yes,
+Intel® Adaptix™ Technology,,,Yes,Yes,Yes,Yes,Yes,Yes,,,,Yes,Yes,Yes,Yes,Yes,Yes,
+Intel® Speed Shift Technology,,,Yes,Yes,Yes,Yes,Yes,Yes,No,,,Yes,Yes,Yes,Yes,Yes,Yes,No
+Intel® Turbo Boost Max Technology 3.0 ‡,,,Yes,Yes,Yes,Yes,Yes,Yes,,,,Yes,Yes,Yes,Yes,Yes,Yes,
+Enhanced Intel SpeedStep® Technology,,,Yes,Yes,Yes,Yes,Yes,Yes,No,,,Yes,Yes,Yes,Yes,Yes,Yes,No
+Thermal Monitoring Technologies,,,Yes,Yes,Yes,Yes,Yes,Yes,,,,Yes,Yes,Yes,Yes,Yes,Yes,
+
+Security & Reliability
+Intel® Trust Domain Extensions (Intel® TDX),Yes,Yes,,,,,,,Yes,Yes,Yes,,,,,,,Yes
+Intel® QuickAssist Software Acceleration,Yes,Yes,,,,,,,Yes,Yes,Yes,,,,,,,Yes
+Intel® Total Memory Encryption - Multi Key,Yes,Yes,Yes,No,Yes,No,No,Yes,Yes,Yes,Yes,Yes,No,Yes,No,No,Yes,Yes
+Intel® Total Memory Encryption,Yes,Yes,,,,,,,Yes,Yes,Yes,,,,,,,Yes
+Intel® AES New Instructions,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+Intel® Software Guard Extensions (Intel® SGX),Yes with Intel® SPS,Yes with Intel® SPS,,,,,,,Yes with Intel® SPS,Yes with Intel® SPS,Yes with Intel® SPS,,,,,,,Yes with Intel® SPS
+Intel® Trusted Execution Technology ‡,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+Execute Disable Bit ‡,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+Intel® Boot Guard,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+Intel® Run Sure Technology,Yes,Yes,,,,,,,Yes,Yes,Yes,,,,,,,Yes
+Mode-based Execute Control (MBEC),Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+Intel® Platform Firmware Resilience Support,Yes,Yes,,,,,,,Yes,Yes,Yes,,,,,,,Yes
+Default Maximum Enclave Page Cache (EPC) Size for Intel® SGX,512 GB,512 GB,,,,,,,512 GB,512 GB,512 GB,,,,,,,512 GB
+Intel® Crypto Acceleration,Yes,Yes,,,,,,,Yes,Yes,Yes,,,,,,,Yes
+Intel® Virtualization Technology (VT-x) ‡,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+Intel® Virtualization Technology for Directed I/O (VT-d) ‡,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+Intel® VT-x with Extended Page Tables (EPT) ‡,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+Intel vPro® Eligibility ‡,,,Intel vPro® Platform,,Intel vPro® Platform,,,Intel vPro® Platform,,,,Intel vPro® Platform,,Intel vPro® Platform,,,Intel vPro® Platform,
+Intel® Threat Detection Technology (TDT),,,Yes,Yes,Yes,Yes,Yes,Yes,,,,Yes,Yes,Yes,Yes,Yes,Yes,
+Intel® Active Management Technology (AMT) ‡,,,Yes,No,Yes,No,No,Yes,,,,Yes,No,Yes,No,No,Yes,
+Intel® Standard Manageability (ISM) ‡,,,Yes,Yes,Yes,Yes,Yes,Yes,,,,Yes,Yes,Yes,Yes,Yes,Yes,
+Intel® Remote Platform Erase (RPE) ‡,,,Yes,No,Yes,No,No,Yes,,,,Yes,No,Yes,No,No,Yes,
+Intel® One-Click Recovery ‡,,,Yes,No,Yes,No,No,Yes,,,,Yes,No,Yes,No,No,Yes,
+Intel® Secure Key,,,Yes,Yes,Yes,Yes,Yes,Yes,,,,Yes,Yes,Yes,Yes,Yes,Yes,
+Intel® Control-Flow Enforcement Technology,,,Yes,Yes,Yes,Yes,Yes,Yes,,,,Yes,Yes,Yes,Yes,Yes,Yes,
+Intel® OS Guard,,,Yes,Yes,Yes,Yes,Yes,Yes,,,,Yes,Yes,Yes,Yes,Yes,Yes,
+Intel® Stable Image Platform Program (SIPP),,,Yes,No,Yes,No,No,Yes,,,,Yes,No,Yes,No,No,Yes,
+Intel® Virtualization Technology with Redirect Protection (VT-rp) ‡,,,Yes,No,Yes,No,No,Yes,,,,Yes,No,Yes,No,No,Yes,
+
+GPU Specifications
+GPU Name ‡,,,Intel® Graphics,Intel® Graphics,Intel® Graphics,Intel® Graphics,Intel® Graphics,Intel® Graphics,,,,Intel® Graphics,Intel® Graphics,Intel® Graphics,Intel® Graphics,Intel® Graphics,Intel® Graphics,
+Graphics Max Dynamic Frequency,,,2.5 GHz,2.3 GHz,2.3 GHz,2.45 GHz,2.5 GHz,2.45 GHz,,,,2.5 GHz,2.3 GHz,2.3 GHz,2.45 GHz,2.5 GHz,2.45 GHz,
+GPU Peak TOPS (Int8),,,40,18,18,40,40,40,,,,40,18,18,40,40,40,
+Graphics Output,,,eDP1.5 |  DP 2.1 UHBR20 |  HDMI 2.1 FRL,eDP1.5 |  DP 2.1 UHBR20 |  HDMI 2.1 FRL,eDP1.5 |  DP 2.1 UHBR20 |  HDMI 2.1 FRL,eDP1.5 |  DP 2.1 UHBR20 |  HDMI 2.1 FRL,eDP1.5 |  DP 2.1 UHBR20 |  HDMI 2.1 FRL,eDP1.5 |  DP 2.1 UHBR20 |  HDMI 2.1 FRL,,,,eDP1.5 |  DP 2.1 UHBR20 |  HDMI 2.1 FRL,eDP1.5 |  DP 2.1 UHBR20 |  HDMI 2.1 FRL,eDP1.5 |  DP 2.1 UHBR20 |  HDMI 2.1 FRL,eDP1.5 |  DP 2.1 UHBR20 |  HDMI 2.1 FRL,eDP1.5 |  DP 2.1 UHBR20 |  HDMI 2.1 FRL,eDP1.5 |  DP 2.1 UHBR20 |  HDMI 2.1 FRL,
+Xe-cores,,,4,2,2,4,4,4,,,,4,2,2,4,4,4,
+Ray Tracing,,,Yes,Yes,Yes,Yes,Yes,Yes,,,,Yes,Yes,Yes,Yes,Yes,Yes,
+Max Resolution (DP)‡,,,7680 x 4320 @ 60Hz,7680 x 4320 @ 60Hz,7680 x 4320 @ 60Hz,7680 x 4320 @ 60Hz,7680 x 4320 @ 60Hz,7680 x 4320 @ 60Hz,,,,7680 x 4320 @ 60Hz,7680 x 4320 @ 60Hz,7680 x 4320 @ 60Hz,7680 x 4320 @ 60Hz,7680 x 4320 @ 60Hz,7680 x 4320 @ 60Hz,
+Max Resolution (eDP - Integrated Flat Panel)‡,,,3840 x 2400 @ 120Hz,3840 x 2400 @ 120Hz,3840 x 2400 @ 120Hz,3840 x 2400 @ 120Hz,3840 x 2400 @ 120Hz,3840 x 2400 @ 120Hz,,,,3840 x 2400 @ 120Hz,3840 x 2400 @ 120Hz,3840 x 2400 @ 120Hz,3840 x 2400 @ 120Hz,3840 x 2400 @ 120Hz,3840 x 2400 @ 120Hz,
+DirectX* Support,,,DirectX 12 Ultimate,DirectX 12 Ultimate,DirectX 12 Ultimate,DirectX 12 Ultimate,DirectX 12 Ultimate,DirectX 12 Ultimate,,,,DirectX 12 Ultimate,DirectX 12 Ultimate,DirectX 12 Ultimate,DirectX 12 Ultimate,DirectX 12 Ultimate,DirectX 12 Ultimate,
+OpenGL* Support,,,4.6,4.6,4.6,4.6,4.6,4.6,,,,4.6,4.6,4.6,4.6,4.6,4.6,
+OpenCL* Support,,,3.0,3.0,3.0,3.0,3.0,3.0,,,,3.0,3.0,3.0,3.0,3.0,3.0,
+H.264 Hardware Encode/Decode,,,Yes,Yes,Yes,Yes,Yes,Yes,,,,Yes,Yes,Yes,Yes,Yes,Yes,
+H.265 (HEVC) Hardware Encode/Decode,,,Yes,Yes,Yes,Yes,Yes,Yes,,,,Yes,Yes,Yes,Yes,Yes,Yes,
+H.266 (VVC) Hardware Encode/Decode,,,Decode Only,Decode Only,Decode Only,Decode Only,Decode Only,Decode Only,,,,Decode Only,Decode Only,Decode Only,Decode Only,Decode Only,Decode Only,
+AV1 Hardware Encode/Decode,,,Yes,Yes,Yes,Yes,Yes,Yes,,,,Yes,Yes,Yes,Yes,Yes,Yes,
+Intel® Quick Sync Video,,,Yes,Yes,Yes,Yes,Yes,Yes,,,,Yes,Yes,Yes,Yes,Yes,Yes,
+# of Displays Supported ‡,,,4,4,4,4,4,4,,,,4,4,4,4,4,4,
+Device ID,,,0xB090,0xB090,0xB090,0xB090,0xB090,0xB090,,,,0xB090,0xB090,0xB090,0xB090,0xB090,0xB090,
+Intel® Deep Learning Boost (Intel® DL Boost) on GPU,,,Yes,Yes,Yes,Yes,Yes,Yes,,,,Yes,Yes,Yes,Yes,Yes,Yes,
+AI Software Frameworks Supported by GPU,,,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebGPU |  WebNN,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebGPU |  WebNN,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebGPU |  WebNN,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebGPU |  WebNN,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebGPU |  WebNN,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebGPU |  WebNN,,,,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebGPU |  WebNN,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebGPU |  WebNN,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebGPU |  WebNN,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebGPU |  WebNN,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebGPU |  WebNN,OpenVINO™ |  WindowsML |  DirectML |  ONNX RT |  WebGPU |  WebNN,
+GPU Lithography,,,Intel 3,Intel 3,Intel 3,Intel 3,Intel 3,Intel 3,,,,Intel 3,Intel 3,Intel 3,Intel 3,Intel 3,Intel 3,
+
+NPU Specifications
+NPU Peak TOPS (Int8),,,49,46,46,47,49,47,,,,49,46,46,47,49,47,
+Sparsity Support,,,Yes,Yes,Yes,Yes,Yes,Yes,,,,Yes,Yes,Yes,Yes,Yes,Yes,
+Windows Studio Effects Support,,,Yes,Yes,Yes,Yes,Yes,Yes,,,,Yes,Yes,Yes,Yes,Yes,Yes,
+AI Software Frameworks Supported by NPU,,,OpenVINO™ |  WindowsML |  WebNN |  ONNX RT,OpenVINO™ |  WindowsML |  WebNN |  ONNX RT,OpenVINO™ |  WindowsML |  WebNN |  ONNX RT,OpenVINO™ |  WindowsML |  WebNN |  ONNX RT,OpenVINO™ |  WindowsML |  WebNN |  ONNX RT,OpenVINO™ |  WindowsML |  WebNN |  ONNX RT,,,,OpenVINO™ |  WindowsML |  WebNN |  ONNX RT,OpenVINO™ |  WindowsML |  WebNN |  ONNX RT,OpenVINO™ |  WindowsML |  WebNN |  ONNX RT,OpenVINO™ |  WindowsML |  WebNN |  ONNX RT,OpenVINO™ |  WindowsML |  WebNN |  ONNX RT,OpenVINO™ |  WindowsML |  WebNN |  ONNX RT,

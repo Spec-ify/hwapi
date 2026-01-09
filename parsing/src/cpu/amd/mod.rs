@@ -29,11 +29,11 @@ fn process_json(json: AmdJson) -> Vec<Cpu<String>> {
         // first strip out some stray keys that appear to be cruft
         // fun fact, some of the models are not a string, but a *number*
         // so fuck you too, amd
-        let name = match raw_data["Model"].clone() {
+        let name = match raw_data["Name"].clone() {
             Value::String(s) => s,
             Value::Number(n) => n.to_string(),
             _ => {
-                panic!("Model of unexpected type encountered")
+                panic!("Name of unexpected type encountered")
             }
         };
         let mut output_cpu = Cpu {
@@ -42,7 +42,7 @@ fn process_json(json: AmdJson) -> Vec<Cpu<String>> {
         };
         for key in raw_data.keys() {
             // stripping out keys that are either garbage, or already handled (model)
-            let blacklist = ["0", "", "Model"];
+            let blacklist = ["0", "", "Name"];
             if blacklist.contains(&key.as_str()) {
                 continue;
             }
@@ -92,7 +92,7 @@ mod tests {
         mock_json.data[0].insert("0".to_string(), Value::String("on".to_string()));
         mock_json.data[0].insert("".to_string(), Value::String("0".to_string()));
         mock_json.data[0].insert(
-            "Model".to_string(),
+            "Name".to_string(),
             Value::String("MOS Systems 6502".to_string()),
         );
         mock_json.data[0].insert("foo".to_string(), Value::String("bar".to_string()));
