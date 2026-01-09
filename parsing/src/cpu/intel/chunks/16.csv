@@ -45,17 +45,7 @@ Description,,,Intel® Core™ Ultra Series 3 processors are suitable for use in 
 
 Memory Specifications
 Max Memory Size (dependent on memory type),1.13 TB,1.13 TB,128 GB,128 GB,128 GB,128 GB,128 GB,128 GB,2.25 TB,1.13 TB,1.13 TB,128 GB,128 GB,128 GB,128 GB,128 GB,128 GB,2.25 TB
-Memory Types,DDR5,DDR5,Up to LPDDR5X 7467 MT/s 
-Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s 
-Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s 
-Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s 
-Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s 
-Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,DDR5,DDR5,DDR5,Up to LPDDR5X 7467 MT/s 
-Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s 
-Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s 
-Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s 
-Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s 
-Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,DDR5
+Memory Types,DDR5,DDR5,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,DDR5,DDR5,DDR5,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,Up to LPDDR5X 7467 MT/s Up to DDR5 6400 MT/s,DDR5
 Maximum Memory Speed,6400 MT/s,4800 MT/s,,,,,,,6400 MHz,6400 MT/s,4800 MT/s,,,,,,,6400 MHz
 Max # of Memory Channels,4,4,2,2,2,2,2,2,8,4,4,2,2,2,2,2,2,8
 Intel® Optane™ Persistent Memory Supported,No,No,,,,,,,No,No,No,,,,,,,No
@@ -64,27 +54,7 @@ ECC Memory Supported   ‡,Yes,Yes,,,,,,,Yes,Yes,Yes,,,,,,,Yes
 Expansion Options
 Scalability,1S Only,1S Only,,,,,,,1S Only,1S Only,1S Only,,,,,,,1S Only
 PCI Express Revision,Gen 4 |  Gen 5,Gen 4 |  Gen 5,5.0 and 4.0,5.0 and 4.0,5.0 and 4.0,5.0 and 4.0,5.0 and 4.0,5.0 and 4.0,Gen4 |  Gen5,Gen 4 |  Gen 5,Gen 4 |  Gen 5,5.0 and 4.0,5.0 and 4.0,5.0 and 4.0,5.0 and 4.0,5.0 and 4.0,5.0 and 4.0,Gen4 |  Gen5
-PCI Express Configurations ‡,32 Lanes Gen 5; 16 Lanes Gen 4,32 Lanes Gen 5; 16 Lanes Gen 4,x4 PCIe5 (1x4 | 2x2) | 
-x4 PCIe4 (1x4 |  2x2 |  4x1)
-x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | 
-x4 PCIe4 (1x4 |  2x2 |  4x1)
-x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | 
-x4 PCIe4 (1x4 |  2x2 |  4x1)
-x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | 
-x4 PCIe4 (1x4 |  2x2 |  4x1)
-x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | 
-x4 PCIe4 (1x4 |  2x2 |  4x1)
-x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),32 Lanes Gen 5; 16 Lanes Gen 4,32 Lanes Gen 5; 16 Lanes Gen 4,32 Lanes Gen 5; 16 Lanes Gen 4,x4 PCIe5 (1x4 | 2x2) | 
-x4 PCIe4 (1x4 |  2x2 |  4x1)
-x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | 
-x4 PCIe4 (1x4 |  2x2 |  4x1)
-x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | 
-x4 PCIe4 (1x4 |  2x2 |  4x1)
-x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | 
-x4 PCIe4 (1x4 |  2x2 |  4x1)
-x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | 
-x4 PCIe4 (1x4 |  2x2 |  4x1)
-x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),32 Lanes Gen 5; 16 Lanes Gen 4
+PCI Express Configurations ‡,32 Lanes Gen 5; 16 Lanes Gen 4,32 Lanes Gen 5; 16 Lanes Gen 4,x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),32 Lanes Gen 5; 16 Lanes Gen 4,32 Lanes Gen 5; 16 Lanes Gen 4,32 Lanes Gen 5; 16 Lanes Gen 4,x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),x4 PCIe5 (1x4 | 2x2) | x4 PCIe4 (1x4 |  2x2 |  4x1)x4 PCIe4 (1x4 |  2x2 |  4x1),32 Lanes Gen 5; 16 Lanes Gen 4
 Max # of PCI Express Lanes,48,48,12,12,12,12,12,12,48,48,48,12,12,12,12,12,12,48
 Intel® Thunderbolt™ 4,,,Yes,Yes,Yes,Yes,Yes,Yes,,,,Yes,Yes,Yes,Yes,Yes,Yes,
 

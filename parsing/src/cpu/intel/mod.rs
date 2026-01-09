@@ -77,6 +77,6 @@ mod tests {
 
     #[test]
     fn it_work() {
-        parse_csv(CHUNKS[0]).unwrap();
+        parse_csv(CHUNKS[15]).unwrap();
     }
 }
