@@ -16,9 +16,9 @@ tokio = { version = "1.47.1", features = ["full"] }
 tower-http = { version = "0.6.6", features = ["cors", "trace"] }
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["json"] }
-opentelemetry-appender-tracing = "0.30.1"
-opentelemetry = "0.28.0"
-opentelemetry_sdk = { version = "0.28.0", features = ["rt-tokio"] }
-opentelemetry-otlp = { version = "0.28.0", default-features = false, features = ["http-json", "reqwest", "reqwest-client"] }
-reqwest = { version = "0.12.9", features = ["multipart"] }
-tracing-opentelemetry = "0.29.0"
+opentelemetry-appender-tracing = "0.31.1"
+opentelemetry = "0.31.0"
+opentelemetry_sdk = { version = "0.31.0", features = ["rt-tokio"] }
+opentelemetry-otlp = { version = "0.31.0", default-features = false, features = ["http-json", "reqwest", "reqwest-client"] }
+reqwest = { version = "0.12.28", features = ["multipart", "rustls-tls"], default-features = false  }
+tracing-opentelemetry = "0.32.0"

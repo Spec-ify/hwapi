@@ -1,0 +1,34 @@
+name: Linux Release Build
+
+on:
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  release-build:
+    runs-on: ubuntu-latest
+
+    strategy:
+        fail-fast: false
+        matrix:
+          target: [x86_64-unknown-linux-musl]
+      
+    steps:
+      - uses: actions/checkout@master
+      
+      - name: Install packages
+        run: |
+          rustup target add x86_64-unknown-linux-musl
+          sudo apt update && sudo apt install musl-dev musl-tools
+
+      - name: Build
+        run: | 
+          cargo build --release --verbose --target-dir /home/runner/work/hwapi/hwapi/final_build --target ${{ matrix.target }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@master
+        with:
+          name: linux-build
+          path: /home/runner/work/hwapi/hwapi/final_build/${{ matrix.target }}/release/hwapi
