@@ -16,7 +16,7 @@ phf = { version = "0.13.1", features = ["macros"] }
 tracing = "0.1.41"
 
 [dev-dependencies]
-criterion = "0.5.1"
+criterion = "0.8.1"
 
 [[bench]]
 name = "usb"
