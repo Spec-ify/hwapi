@@ -21,7 +21,7 @@ fn gen_bugcheck() {
     let mut generated_map = phf_codegen::Map::new();
     let cache = CodeCache::new();
     for (code, (name, url)) in cache.iter() {
-        generated_map.entry(code, &format!("({name:?}, {url:?})"));
+        generated_map.entry(code, format!("({name:?}, {url:?})"));
     }
     write!(
         &mut generated_file,
@@ -44,9 +44,9 @@ fn gen_amd_cpus() {
         // if an entry wasn't already added
         if entries.insert(cpu.name.clone()) {
             for attr in cpu.attributes {
-                attributes_map.entry(format!("{:?}", attr.0), &format!("{:?}", attr.1));
+                attributes_map.entry(format!("{:?}", attr.0), format!("{:?}", attr.1));
             }
-            generated_map.entry(cpu.name, &format!("{}", attributes_map.build()));
+            generated_map.entry(cpu.name, format!("{}", attributes_map.build()));
         }
     }
     write!(
@@ -71,9 +71,9 @@ fn gen_intel_cpus() {
         // if an entry wasn't already added
         if entries.insert(cpu.name.to_string()) {
             for attr in cpu.attributes {
-                attributes_map.entry(format!("{:?}", attr.0), &format!("{:?}", attr.1));
+                attributes_map.entry(format!("{:?}", attr.0), format!("{:?}", attr.1));
             }
-            generated_map.entry(cpu.name, &format!("{}", attributes_map.build()));
+            generated_map.entry(cpu.name, format!("{}", attributes_map.build()));
         }
     }
     write!(
