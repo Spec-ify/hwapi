@@ -37,12 +37,12 @@ fn gen_amd_cpus() {
     let mut generated_file = BufWriter::new(File::create(destination).unwrap());
     let mut generated_map = phf_codegen::Map::new();
     // there are a few duplicate entries, so this is quick and dirty way to do duplicate detection
-    let mut entries: HashSet<String> = HashSet::new();
+    let mut entries: HashSet<&str> = HashSet::new();
     let cpu_cache = IntermediateCpuCache::new();
     for cpu in cpu_cache.amd_cpus {
         let mut attributes_map = phf_codegen::Map::new();
         // if an entry wasn't already added
-        if entries.insert(cpu.name.clone()) {
+        if entries.insert(cpu.name) {
             for attr in cpu.attributes {
                 attributes_map.entry(format!("{:?}", attr.0), format!("{:?}", attr.1));
             }
