@@ -26,7 +26,7 @@ pub fn lex_csv<'a>(input: &'a str) -> Result<LexerOutput<'a>, Box<dyn Error + 'a
 /// Header of CSV contains the title of each data entry
 fn read_file_header(input: &str) -> IResult<&str, Vec<&str>> {
     let header_line: (&str, &str) = take_until("\n")(input)?;
-    let split_input: Vec<&str> = header_line.1.split("\",\"").map(|s| s.trim_matches('"')).collect();
+    let split_input: Vec<&str> = header_line.1.split("\",\"").map(|s| s.trim_matches(|c| c == '"' || c == ',' || c == '\n')).collect();
     // .strip_prefix is used because take_until includes the "until" part
     // in the remainder instead of dropping it
     Ok(("", split_input))
@@ -40,7 +40,7 @@ fn read_record(input: &str) -> IResult<&str, Vec<Vec<&str>>> {
     let mut cpu_record: Vec<Vec<&str>> = Vec::with_capacity(1024);
 
     for cpu in cpu_list {
-        let cpu_vector: Vec<&str> = cpu.split("\",\"").map(|s| s.trim_matches('"')).collect();
+        let cpu_vector: Vec<&str> = cpu.split("\",\"").map(|s| s.trim_matches(|c| c == '"' || c == ',' || c == '\n')).collect();
         cpu_record.push(cpu_vector);
     }
     // .strip_prefix is used because take_until includes the "until" part
@@ -54,9 +54,9 @@ mod tests {
 
     #[test]
     fn basic_read_header() {
-        let mock_header = "\"Name\",\"Family\",\"Series\",\"Form Factor\",\"# of CPU Cores\",\"# of Threads\",\"Max. Boost Clock\",\"Base Clock\",\"L2 Cache\"";
+        let mock_header = "\"Name\",\"Family\",\"Series\",\"Form Factor\",\"# of CPU Cores\",\"# of Threads\",\"Max. Boost Clock\",\"Base Clock\",\"L2 Cache\"\n";
         let output: (&str, Vec<&str>) = read_file_header(mock_header).unwrap();
-        assert_eq!(output.1[output.1.len() - 1], "01/14/2024 01:06:53 PM");
+        assert_eq!(output.1[output.1.len() - 1], "L2 Cache");
     }
 
     #[test]
