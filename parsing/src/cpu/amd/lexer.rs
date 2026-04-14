@@ -70,7 +70,7 @@ mod tests {
 
     #[test]
     fn basic_read_header() {
-        let mock_header = "\"Name\",\"Family\",\"Series\",\"Form Factor\",\"# of CPU Cores\",\"# of Threads\",\"Max. Boost Clock\",\"Base Clock\",\"L2 Cache\"\n";
+        let mock_header = "\u{feff}\"Name\",\"Family\",\"Series\",\"Form Factor\",\"# of CPU Cores\",\"# of Threads\",\"Max. Boost Clock\",\"Base Clock\",\"L2 Cache\"\n";
         let output: (&str, Vec<&str>) = read_file_header(mock_header).unwrap();
         assert_eq!(output.1[output.1.len() - 1], "L2 Cache");
     }
