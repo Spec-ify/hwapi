@@ -44,7 +44,7 @@ struct IndexEntry {
 pub struct IntermediateCpuCache<'a> {
     pub intel_cpus: Vec<Cpu<&'a str>>,
     intel_index: Vec<IndexEntry>,
-    pub amd_cpus: Vec<Cpu<String>>,
+    pub amd_cpus: Vec<Cpu<&'a str>>,
     amd_index: Vec<IndexEntry>,
 }
 
@@ -143,11 +143,14 @@ impl IntermediateCpuCache<'_> {
                 Err(Box::from("No close matches found"))
             }
             Some(idx_entry) => {
+                let found_cpu: &Cpu<&str>;
+
                 if input.contains("AMD") {
-                    return Ok(self.amd_cpus[idx_entry.index].clone());
+                    found_cpu= &self.amd_cpus[idx_entry.index];
                 }
-                // intel requires some work to un-zerocopy data
-                let found_cpu = &self.intel_cpus[idx_entry.index];
+                else {
+                    found_cpu = &self.intel_cpus[idx_entry.index];
+                }
                 Ok(Cpu {
                     name: found_cpu.name.to_string(),
                     attributes: found_cpu
