@@ -1,6 +1,8 @@
 use std::error::Error;
 
-use nom::bytes::complete::{take_until};
+use nom::branch::alt;
+use nom::bytes::complete::{tag, take_until};
+use nom::sequence::{delimited, terminated};
 use nom::IResult;
 
 /// Everything deserialized by the lexer
@@ -25,17 +27,32 @@ pub fn lex_csv<'a>(input: &'a str) -> Result<LexerOutput<'a>, Box<dyn Error + 'a
 
 /// Header of CSV contains the title of each data entry
 fn read_file_header(input: &str) -> IResult<&str, Vec<&str>> {
-    let header_line: (&str, &str) = take_until("\n")(input)?;
+    // stripping BOM bytes from start of file
+    let header_line = delimited(
+        tag("\u{feff}"),
+        take_until("\n"),
+        tag("\n"),
+    )(input)?;
+
     let split_input: Vec<&str> = header_line.1.split("\",\"").map(|s| s.trim_matches(|c| c == '"' || c == ',' || c == '\n')).collect();
-    // .strip_prefix is used because take_until includes the "until" part
-    // in the remainder instead of dropping it
+
     Ok(("", split_input))
 }
 
 // CPUs are formatted according to the header
 fn read_record(input: &str) -> IResult<&str, Vec<Vec<&str>>> {
+
+    // Removing the header from the input
     // File terminates with double newlines
-    let cpu_records: (&str, &str) = take_until("\n\n")(input)?;
+    let cpu_records= delimited(
+        // read a whole line, this is discarded
+        terminated(take_until::<_, _, nom::error::Error<_>>("\n"), tag("\n")),
+        // read until two newlines in a row
+        alt((take_until("\n\n"), take_until("\r\n\r\n"))),
+        // discard the rest
+        alt((tag("\n\n"), tag("\r\n\r\n"))),
+    )(input)?;
+
     let cpu_list: Vec<&str> = cpu_records.1.split('\n').collect();
     let mut cpu_record: Vec<Vec<&str>> = Vec::with_capacity(1024);
 
@@ -43,8 +60,7 @@ fn read_record(input: &str) -> IResult<&str, Vec<Vec<&str>>> {
         let cpu_vector: Vec<&str> = cpu.split("\",\"").map(|s| s.trim_matches(|c| c == '"' || c == ',' || c == '\n')).collect();
         cpu_record.push(cpu_vector);
     }
-    // .strip_prefix is used because take_until includes the "until" part
-    // in the remainder instead of dropping it
+
     Ok(("", cpu_record))
 }
 

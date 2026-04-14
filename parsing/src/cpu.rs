@@ -145,7 +145,6 @@ impl IntermediateCpuCache<'_> {
             Some(idx_entry) => {
                 let found_cpu: &Cpu<&str>;
 
-                // intel requires some work to un-zerocopy data
                 if input.contains("AMD") {
                     found_cpu= &self.amd_cpus[idx_entry.index];
                 }
