@@ -15,7 +15,7 @@ clap = { version = "4.6", features = ["derive"] }
 tokio = { version = "1.50.0", features = ["full"] }
 tower-http = { version = "0.6.6", features = ["cors", "trace"] }
 tracing = "0.1.41"
-tracing-subscriber = { version = "0.3.19", features = ["json"] }
+tracing-subscriber = { version = "0.3.23", features = ["json"] }
 opentelemetry-appender-tracing = "0.31.1"
 opentelemetry = "0.31.0"
 opentelemetry_sdk = { version = "0.31.0", features = ["rt-tokio"] }
