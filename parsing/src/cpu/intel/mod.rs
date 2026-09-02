@@ -44,7 +44,7 @@ for (const chunk of chunks) {
 */
 
 // this list should contain every intel processor till the beginning of 2024
-const CHUNKS: [&str; 16] = [
+const CHUNKS: [&str; 19] = [
     include_str!("chunks/1.csv"),
     include_str!("chunks/2.csv"),
     include_str!("chunks/3.csv"),
@@ -61,6 +61,9 @@ const CHUNKS: [&str; 16] = [
     include_str!("chunks/14.csv"),
     include_str!("chunks/15.csv"),
     include_str!("chunks/16.csv"),
+    include_str!("chunks/17.csv"),
+    include_str!("chunks/18.csv"),
+    include_str!("chunks/19.csv"),
 ];
 
 pub fn get_intel_cpus() -> Vec<Cpu<&'static str>> {

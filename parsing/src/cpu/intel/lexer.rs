@@ -1,6 +1,7 @@
 use core::slice;
 use std::error::Error;
 
+use nom::branch::alt;
 use nom::bytes::complete::{tag, take_until};
 use nom::sequence::{delimited, terminated};
 use nom::IResult;
@@ -52,12 +53,23 @@ pub fn lex_csv<'a>(input: &'a str) -> Result<LexerOutput<'a>, Box<dyn Error + 'a
 
 /// The header of the file contains some generic boilerplate and the date of the report generation
 fn read_file_header(input: &str) -> IResult<&str, &str> {
-    delimited(
-        // apparently the csv starts with a 0 width space?
+    // apparently the csv starts with a 0 width space?
+
+    // as of sep 2026, intel changed the output of the comparison csv
+    // from "[BOM Byte] ARK | Intel..." to "[BOM Byte] Intel..." - k9
+    alt((
+        // old csv format (1-16)
+        delimited(
         tag("\u{feff}ARK | Intel® Product Specification Comparison\n"),
         take_until("\n"),
-        tag("\n ,"),
-    )(input)
+        tag("\n ,"),),
+        
+        // new csv format (17-)
+        delimited(
+        tag("\u{feff}Intel® Product Specification Comparison\n"),
+        take_until("\n"),
+        tag("\n ,"),),
+    ))(input)
 }
 
 /// The list of CPUs has formatting that varies slightly from a normal record
